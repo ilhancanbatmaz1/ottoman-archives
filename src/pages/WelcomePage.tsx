@@ -2,12 +2,16 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Scroll, BookOpen, Star, Trophy, Users, ArrowRight, CheckCircle2, Instagram } from 'lucide-react';
 import { SEO } from '../components/SEO';
+import { useContent } from '../context/ContentContext';
 
 export const WelcomePage = () => {
+    const heroTitle = useContent('home_hero_title', 'Tarihin <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-500">Tozlu Sayfalarını</span> Aralayın');
+    const heroSubtitle = useContent('home_hero_subtitle', 'Osmanlıca arşiv belgelerini okumayı öğrenin, kendinizi geliştirin ve tarihe tanıklık edin. Yapay zeka destekli pratik araçlarıyla öğrenmek artık çok daha kolay.');
+    const footerText = useContent('footer_text', '© 2026 Osmanlıca Okuma Yardımcısı. Tarihi sevdirmek için geliştirildi.');
+
     return (
         <div className="min-h-screen bg-amber-50 text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
             <SEO title="Ana Sayfa" description="Osmanlı Türkçesi arşiv belgelerini okumayı öğrenmek için en kapsamlı platform. Orijinal belgelerle tarih yolculuğuna çıkın." />
-            {/* Header */}
             {/* Header */}
             <nav className="w-full px-4 sm:px-6 py-4 sm:py-6 flex flex-wrap justify-between items-center max-w-7xl mx-auto gap-4">
                 <div className="flex items-center gap-2">
@@ -47,11 +51,12 @@ export const WelcomePage = () => {
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 text-amber-800 text-sm font-bold uppercase tracking-wider mb-8 border border-amber-200">
                             <Star size={16} fill="currentColor" /> %100 Ücretsiz Eğitim Aracı
                         </div>
-                        <h1 className="text-5xl lg:text-7xl font-black text-gray-900 leading-tight mb-8">
-                            Tarihin <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-500">Tozlu Sayfalarını</span> Aralayın
-                        </h1>
+                        <h1
+                            className="text-5xl lg:text-7xl font-black text-gray-900 leading-tight mb-8"
+                            dangerouslySetInnerHTML={{ __html: heroTitle }}
+                        />
                         <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                            Osmanlıca arşiv belgelerini okumayı öğrenin, kendinizi geliştirin ve tarihe tanıklık edin. Yapay zeka destekli pratik araçlarıyla öğrenmek artık çok daha kolay.
+                            {heroSubtitle}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                             <Link to="/signup" className="px-8 py-4 bg-amber-600 text-white rounded-2xl font-bold text-lg hover:bg-amber-700 transition-all shadow-xl shadow-amber-600/30 flex items-center justify-center gap-2 hover:-translate-y-1 transform">
@@ -188,7 +193,7 @@ export const WelcomePage = () => {
                         </a>
                     </div>
                     <div className="text-gray-400 text-sm">
-                        © 2026 Tüm hakları saklıdır. Tarihi sevdirmek için geliştirildi.
+                        {footerText}
                     </div>
                 </div>
             </footer>
