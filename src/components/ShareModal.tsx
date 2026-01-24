@@ -118,7 +118,7 @@ export const ShareModal = ({ isOpen, onClose, title, url }: Props) => {
                             </div>
 
                             {/* Native Share for Mobile */}
-                            {navigator.share && (
+                            {typeof navigator.share === 'function' && (
                                 <button
                                     onClick={handleShare}
                                     className="w-full py-3 bg-amber-600 text-white rounded-xl font-bold text-sm hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"

@@ -765,6 +765,13 @@ export const DocumentViewer = ({ doc }: Props) => {
                     </motion.div>
                 </div>
             )}
+            {/* Share Modal */}
+            <ShareModal
+                isOpen={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                title={doc.title}
+                url={window.location.href}
+            />
         </div>
     );
 };
