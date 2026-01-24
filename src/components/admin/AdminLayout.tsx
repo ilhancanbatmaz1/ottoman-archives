@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import {
@@ -31,6 +31,15 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { logout } = useAdminAuth();
 
+    // Check screen size to manage state if needed, but CSS is preferred for display
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const handleLogout = () => {
         logout();
         navigate('/');
@@ -52,11 +61,17 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
 
     const breadcrumbs = getBreadcrumbs();
 
+    const sidebarVariants = {
+        open: { x: 0 },
+        closed: { x: '-100%' },
+        desktop: { x: 0 }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex">
             {/* Mobile Sidebar Overlay */}
             <AnimatePresence>
-                {sidebarOpen && (
+                {sidebarOpen && isMobile && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -69,9 +84,11 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
 
             {/* Sidebar */}
             <motion.aside
-                initial={false}
-                animate={{ x: sidebarOpen ? 0 : '-100%' }}
-                className="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col lg:translate-x-0 transition-transform"
+                initial={isMobile ? "closed" : "desktop"}
+                animate={isMobile ? (sidebarOpen ? "open" : "closed") : "desktop"}
+                variants={sidebarVariants}
+                transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+                className="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col"
             >
                 {/* Logo/Header */}
                 <div className="p-6 border-b border-gray-800">
