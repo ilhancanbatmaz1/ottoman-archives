@@ -64,14 +64,14 @@ export const LoginPage = () => {
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <div className="space-y-1">
-                            <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Kullanıcı Adı</label>
+                            <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Email veya Kullanıcı Adı</label>
                             <div className="relative">
                                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                                 <input
                                     {...register('username')}
                                     type="text"
                                     className={`w-full pl-12 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 outline-none transition-all ${errors.username ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-gray-200 focus:border-amber-500 focus:ring-amber-200'}`}
-                                    placeholder="Kullanıcı adınız"
+                                    placeholder="Kullanıcı adı veya email"
                                 />
                             </div>
                             {errors.username && <p className="text-xs text-red-500 font-medium pl-1">{errors.username.message}</p>}

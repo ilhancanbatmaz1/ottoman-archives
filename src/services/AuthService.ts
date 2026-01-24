@@ -84,11 +84,35 @@ export class AuthService {
 
     /**
      * Sign in with Supabase Auth
+     * Accepts either email or username
      */
-    static async signInWithSupabase(email: string, password: string) {
+    static async signInWithSupabase(identifier: string, password: string) {
         try {
+            let emailToUse = identifier;
+
+            // Check if identifier is an email
+            const isEmail = identifier.includes('@');
+
+            if (!isEmail) {
+                // It is a username, look up the email
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('email')
+                    .eq('username', identifier)
+                    .single();
+
+                if (error || !data) {
+                    return {
+                        success: false,
+                        error: 'Bu kullanıcı adı ile kayıtlı kullanıcı bulunamadı'
+                    };
+                }
+
+                emailToUse = data.email;
+            }
+
             const { data, error } = await supabase.auth.signInWithPassword({
-                email,
+                email: emailToUse,
                 password
             });
 
