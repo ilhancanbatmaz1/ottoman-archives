@@ -47,6 +47,9 @@ export const DocumentManager = () => {
                             <button onClick={() => setDeleteDocConfirmId(doc.id)} className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors" title="Belgeyi Sil">
                                 <Trash2 size={20} />
                             </button>
+                            <Link to={`/admin/documents/edit/${doc.id}`} className="p-3 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-colors" title="Düzenle">
+                                <FileText size={20} />
+                            </Link>
                         </div>
                     ))}
                 </div>
