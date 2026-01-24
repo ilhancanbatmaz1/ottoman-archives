@@ -75,6 +75,48 @@ export const DocumentViewer = ({ doc }: Props) => {
         recordAttempt(doc.id, selectedWord.id, selectedWord.original, selectedWord.modern, isCorrect);
     };
 
+    // Keyboard Navigation
+    useEffect(() => {
+        if (view !== 'interactive') return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if typing in an input
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+            if (e.key === 'Escape') {
+                setSelectedWord(null);
+                setHoveredWord(null);
+                return;
+            }
+
+            if (!selectedWord && (e.key === 'ArrowRight' || e.key === 'ArrowDown')) {
+                // Select first word if nothing selected
+                if (doc.tokens.length > 0) setSelectedWord(doc.tokens[0]);
+                return;
+            }
+
+            if (selectedWord) {
+                const currentIndex = doc.tokens.findIndex(t => t.id === selectedWord.id);
+                if (currentIndex === -1) return;
+
+                let nextIndex = currentIndex;
+
+                if (e.key === 'ArrowRight') nextIndex = Math.min(doc.tokens.length - 1, currentIndex + 1);
+                else if (e.key === 'ArrowLeft') nextIndex = Math.max(0, currentIndex - 1);
+                else if (e.key === 'ArrowDown') nextIndex = Math.min(doc.tokens.length - 1, currentIndex + 5); // Jump line approx
+                else if (e.key === 'ArrowUp') nextIndex = Math.max(0, currentIndex - 5);
+
+                if (nextIndex !== currentIndex) {
+                    e.preventDefault();
+                    setSelectedWord(doc.tokens[nextIndex]);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [view, selectedWord, doc.tokens]);
+
     const handleAddNote = () => {
         if (!selectedWord || !noteInput.trim()) return;
         addNote(doc.id, selectedWord.id, selectedWord.original, selectedWord.modern, noteInput.trim());

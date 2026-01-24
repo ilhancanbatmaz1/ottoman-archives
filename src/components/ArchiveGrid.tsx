@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { type ArchivalDocument } from '../data/documents';
-import { Calendar, ArrowRight, AlertCircle } from 'lucide-react';
+import { Calendar, ArrowRight, AlertCircle, Search } from 'lucide-react';
 import { DocumentService } from '../services/DocumentService';
 import { Skeleton } from './Skeleton';
 
@@ -19,6 +19,7 @@ export const ArchiveGrid = ({ onSelect, filters }: Props) => {
     const [documents, setDocuments] = useState<ArchivalDocument[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         const fetchFilteredDocuments = async () => {
@@ -59,6 +60,12 @@ export const ArchiveGrid = ({ onSelect, filters }: Props) => {
         return () => clearTimeout(timeoutId);
     }, [filters.difficulty, filters.category, filters.year]); // Re-fetch when ANY filter changes
 
+    // Filter documents based on search query
+    const filteredDocuments = documents.filter(doc =>
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     // Loading State
     if (loading) {
         return (
@@ -93,77 +100,91 @@ export const ArchiveGrid = ({ onSelect, filters }: Props) => {
         );
     }
 
-    if (documents.length === 0) {
-        return (
-            <div className="text-center py-16 text-gray-400">
-                <p>Aradığınız kriterlere uygun belge bulunamadı.</p>
-                <button
-                    onClick={() => {
-                        // This relies on parent resetting filters, or we can just show a message.
-                        // Ideally we would trigger a reset callback if passed.
-                    }}
-                    className="mt-2 text-sm text-amber-600 hover:underline"
-                >
-                    Filtreleri temizlemeyi deneyin
-                </button>
-            </div>
-        );
-    }
-
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {documents.map((doc, index) => (
-                <motion.div
-                    key={doc.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => onSelect(doc)}
-                    className="group cursor-pointer bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-amber-700 transition-all shadow-sm hover:shadow-md"
-                >
-                    <div className="h-48 overflow-hidden bg-gray-100 relative">
-                        <img
-                            src={doc.imageUrl}
-                            alt={doc.title}
-                            className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
-                            loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
+        <div className="space-y-8">
+            {/* Search Input */}
+            <div className="relative max-w-md mx-auto">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                    type="text"
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm shadow-sm transition-shadow"
+                    placeholder="Belge adı veya kategori ara..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
 
-                    <div className="p-6">
-                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
-                                {doc.category}
-                            </span>
-                            {doc.difficulty && (
-                                <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${doc.difficulty === 'Kolay' ? 'bg-green-50 text-green-700' :
-                                    doc.difficulty === 'Orta' ? 'bg-yellow-50 text-yellow-700' :
-                                        'bg-red-50 text-red-700'
-                                    }`}>
-                                    {doc.difficulty}
-                                </span>
-                            )}
-                            {doc.year && (
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
-                                    {doc.year}
-                                </span>
-                            )}
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-amber-800 transition-colors line-clamp-2">
-                            {doc.title}
-                        </h3>
-                        <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-500 border-t border-gray-50 pt-4">
-                            <span className="flex items-center gap-1.5">
-                                <Calendar size={14} className="text-gray-400" /> {doc.date}
-                            </span>
-                            <span className="flex items-center gap-1.5 justify-end text-amber-600 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all">
-                                İncele <ArrowRight size={14} />
-                            </span>
-                        </div>
-                    </div>
-                </motion.div>
-            ))}
+            {filteredDocuments.length === 0 ? (
+                <div className="text-center py-16 text-gray-400">
+                    <p>Aradığınız kriterlere uygun belge bulunamadı.</p>
+                    <button
+                        onClick={() => {
+                            setSearchQuery('');
+                            // Ideally trigger parent filter reset too if needed
+                        }}
+                        className="mt-2 text-sm text-amber-600 hover:underline"
+                    >
+                        Aramayı temizle
+                    </button>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredDocuments.map((doc, index) => (
+                        <motion.div
+                            key={doc.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            onClick={() => onSelect(doc)}
+                            className="group cursor-pointer bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-amber-700 transition-all shadow-sm hover:shadow-md"
+                        >
+                            <div className="h-48 overflow-hidden bg-gray-100 relative">
+                                <img
+                                    src={doc.imageUrl}
+                                    alt={doc.title}
+                                    className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                                    loading="lazy"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+
+                            <div className="p-6">
+                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                                        {doc.category}
+                                    </span>
+                                    {doc.difficulty && (
+                                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${doc.difficulty === 'Kolay' ? 'bg-green-50 text-green-700' :
+                                            doc.difficulty === 'Orta' ? 'bg-yellow-50 text-yellow-700' :
+                                                'bg-red-50 text-red-700'
+                                            }`}>
+                                            {doc.difficulty}
+                                        </span>
+                                    )}
+                                    {doc.year && (
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
+                                            {doc.year}
+                                        </span>
+                                    )}
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-amber-800 transition-colors line-clamp-2">
+                                    {doc.title}
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-500 border-t border-gray-50 pt-4">
+                                    <span className="flex items-center gap-1.5">
+                                        <Calendar size={14} className="text-gray-400" /> {doc.date}
+                                    </span>
+                                    <span className="flex items-center gap-1.5 justify-end text-amber-600 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all">
+                                        İncele <ArrowRight size={14} />
+                                    </span>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
