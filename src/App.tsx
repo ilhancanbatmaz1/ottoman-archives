@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scroll, ChevronDown, BookOpen, Lock, TrendingUp, Trophy, User, Power, Loader2 } from 'lucide-react';
+import { Scroll, ChevronDown, BookOpen, TrendingUp, Trophy, User, Power, Loader2 } from 'lucide-react';
 import { DocumentViewer } from './components/DocumentViewer';
 import { DocumentProvider } from './context/DocumentContext';
 import { LearningProvider } from './context/LearningContext';
@@ -192,11 +192,6 @@ function PublicApp() {
 
       <footer className="border-t border-gray-100 py-12 text-center text-sm text-gray-400">
         <p>© 2026 Osmanlıca Okuma Yardımcısı. <br className="sm:hidden" />Tarihi sevdirmek için geliştirildi.</p>
-        <div className="mt-4 flex justify-center">
-          <Link to="/admin" className="text-gray-300 hover:text-gray-500 transition-colors p-2">
-            <Lock size={14} />
-          </Link>
-        </div>
       </footer>
     </>
   );

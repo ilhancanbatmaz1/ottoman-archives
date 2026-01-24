@@ -146,10 +146,10 @@ export const DocumentViewer = ({ doc }: Props) => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="grid grid-cols-1 lg:grid-cols-2 gap-12"
+                            className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start"
                         >
                             {/* Belge Görseli */}
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-4 lg:col-span-7 lg:sticky lg:top-8">
                                 <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg flex items-start gap-3">
                                     <Info className="text-amber-700 shrink-0 mt-0.5" size={18} />
                                     <div>
@@ -238,8 +238,8 @@ export const DocumentViewer = ({ doc }: Props) => {
                                 </div>
                             </div>
 
-                            {/* Kelime Listesi ve Analiz */}
-                            <div className="flex flex-col gap-8">
+                            {/* Kelime Listesi ve Analiz - Sağ Taraf */}
+                            <div className="flex flex-col gap-8 lg:col-span-5 w-full">
                                 {selectedWord ? (
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
