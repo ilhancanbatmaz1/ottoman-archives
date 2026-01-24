@@ -6,7 +6,7 @@ import { SEO } from '../components/SEO';
 export const WelcomePage = () => {
     return (
         <div className="min-h-screen bg-amber-50 text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
-            <SEO title="Ana Sayfa" description="Osmanlı Türkçesi arşiv belgelerini okumayı öğrenmek için en kapsamlı platform." />
+            <SEO title="Ana Sayfa" description="Osmanlı Türkçesi arşiv belgelerini okumayı öğrenmek için en kapsamlı platform. Orijinal belgelerle tarih yolculuğuna çıkın." />
             {/* Header */}
             <nav className="w-full px-6 py-6 flex justify-between items-center max-w-7xl mx-auto">
                 <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, User, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { SEO } from '../../components/SEO';
 
 export const LoginPage = () => {
     const { login } = useAuth();
@@ -39,6 +40,7 @@ export const LoginPage = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex flex-col">
+            <SEO title="Giriş Yap" description="Hesabınıza giriş yapın ve kaldığınız yerden devam edin." />
             {/* Header */}
             <nav className="w-full p-6">
                 <Link to="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">

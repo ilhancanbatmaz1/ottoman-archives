@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, User, Lock, UserPlus, AlertCircle, Type } from 'lucide-react';
+import { SEO } from '../../components/SEO';
 
 export const SignupPage = () => {
     const { signup } = useAuth();
@@ -53,6 +54,7 @@ export const SignupPage = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex flex-col">
+            <SEO title="Kayıt Ol" description="Ücretsiz hesap oluşturun ve Osmanlıca öğrenmeye başlayın." />
             {/* Header */}
             <nav className="w-full p-6">
                 <Link to="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
