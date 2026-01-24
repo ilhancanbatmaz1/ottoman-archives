@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { LearningService } from '../services/LearningService';
 // Types
 export interface WordAttempt {
     wordId: string;
@@ -309,9 +310,38 @@ export const LearningProvider = ({ children }: { children: ReactNode }) => {
         };
     };
 
-    const leaderboard = [...simulatedLeaderboard];
-    if (profile.name) leaderboard.push({ name: profile.name + ' (Sen)', score: profile.xp });
-    leaderboard.sort((a, b) => b.score - a.score);
+    // Leaderboard State
+    const [leaderboardData, setLeaderboardData] = useState<{ name: string; score: number; isUser?: boolean }[]>([]);
+
+    useEffect(() => {
+        const fetchLeaderboard = async () => {
+            const { success, leaderboard } = await LearningService.getLeaderboard(10);
+            if (success) {
+                // If user is logged in, try to find them or add them
+                // Since we don't have real names, we map local user name if found
+                const mapped = leaderboard.map((l: any) => ({
+                    name: l.userId === user?.id ? (profile.name || 'Siz') : l.name,
+                    score: l.score,
+                    isUser: l.userId === user?.id
+                }));
+                setLeaderboardData(mapped);
+            } else {
+                setLeaderboardData(simulatedLeaderboard);
+            }
+        };
+
+        fetchLeaderboard();
+        // Refresh every minute
+        const interval = setInterval(fetchLeaderboard, 60000);
+        return () => clearInterval(interval);
+    }, [user?.id, profile.name]);
+
+    // Derived leaderboard for display
+    const leaderboard = leaderboardData.length > 0 ? leaderboardData : simulatedLeaderboard;
+
+    // Ensure current user is in list if not present (optional, usually for 'You' rank)
+    // For now we just use the top 10 fetched.
+
 
     return (
         <LearningContext.Provider value={{

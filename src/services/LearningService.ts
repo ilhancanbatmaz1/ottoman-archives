@@ -192,6 +192,61 @@ export class LearningService {
         }
     }
 
+    /**
+     * Get global leaderboard
+     */
+    static async getLeaderboard(limit = 50) {
+        try {
+            // Check if user_progress table allows reading public data
+            // We join with profiles (users table might be restricted, usually profiles table is used for public info)
+            // But relying on what we have. If 'users' table is not readable, this might fail.
+            // Assuming we might need to create a view or RPC in a real scenario, but trying direct query first.
+
+            // Note: Directly querying 'auth.users' is usually not possible from client. 
+            // We likely need a public 'profiles' table. 
+            // If that doesn't exist, we can only show anonymous or rely on 'user_progress' having a 'username' column?
+
+            // For now, let's try to fetch user_progress and see if we can get data.
+            // If user_progress doesn't have names, we have a problem.
+
+            // Let's assume we can't join auth.users securely.
+            // We should use a 'profiles' table if it existed.
+            // Since I cannot create tables, I will check if 'user_progress' has a username/display_name column?
+            // AuthService inserts into user_progress: user_id, total_words_learned, etc. No name.
+
+            // WORKAROUND: We will return the data we have. If we can't get names, we might show "User #123".
+            // OR we can try to join with `profiles` if it exists.
+
+            const { data, error } = await supabase
+                .from('user_progress')
+                .select('total_words_learned, user_id') // minimal selection
+                .order('total_words_learned', { ascending: false })
+                .limit(limit);
+
+            if (error) throw error;
+
+            // Since we can't easily get names without a profiles table, 
+            // we'll mock the names for OTHER users for now to prevent breaking UI, 
+            // BUT use real scores.
+            // In a real app we'd add a 'full_name' column to user_progress or use a profiles table.
+
+            // To make this better, let's adding a generic name generator based on ID?
+            // Or just 'Anonymous Archivist'.
+
+            return {
+                success: true,
+                leaderboard: data.map((entry: any, index: number) => ({
+                    userId: entry.user_id,
+                    name: `Arşiv Okuru ${index + 1}`, // Placeholder until we have profiles
+                    score: (entry.total_words_learned || 0) * 10
+                }))
+            };
+        } catch (error: any) {
+            console.error('Error fetching leaderboard:', error);
+            return { success: false, error: error.message, leaderboard: [] };
+        }
+    }
+
     // ========================================
     // LOCALSTORAGE METHODS (FALLBACK)
     // ========================================
