@@ -9,6 +9,9 @@ export const LoginPage = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
+    // Debug log to verify update
+    console.log('LoginPage rendered v2');
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -97,6 +100,12 @@ export const LoginPage = () => {
                                     placeholder="••••••••"
                                 />
                             </div>
+                        </div>
+
+                        <div className="flex justify-end mt-2 mb-4">
+                            <Link to="/forgot-password" className="text-sm font-bold text-amber-600 hover:text-amber-800 hover:underline transition-colors py-2 inline-block">
+                                Şifreni mi unuttun?
+                            </Link>
                         </div>
 
                         <button

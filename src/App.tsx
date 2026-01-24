@@ -11,6 +11,7 @@ import { ToastProvider } from './context/ToastContext';
 // Static imports removed for lazy loading
 import { ReloadPrompt } from './components/ReloadPrompt';
 import { WelcomePage } from './pages/WelcomePage';
+import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -25,6 +26,8 @@ const DictionaryPage = lazy(() => import('./pages/DictionaryPage').then(module =
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage').then(module => ({ default: module.LeaderboardPage })));
 const LoginPage = lazy(() => import('./pages/auth/LoginPage').then(module => ({ default: module.LoginPage })));
 const SignupPage = lazy(() => import('./pages/auth/SignupPage').then(module => ({ default: module.SignupPage })));
+const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage').then(module => ({ default: module.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage').then(module => ({ default: module.ResetPasswordPage })));
 
 // Loading Component
 const PageLoader = () => (
@@ -199,6 +202,8 @@ function MainRoutes() {
         <Route path="/" element={user ? <PublicApp /> : <WelcomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLogin />} />
@@ -254,22 +259,24 @@ function MainRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <AdminAuthProvider>
-        <ToastProvider>
-          <LearningProvider>
-            <FeedbackProvider>
-              <DocumentProvider>
-                <BrowserRouter>
-                  <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
-                    <MainRoutes />
-                    <ReloadPrompt />
-                  </div>
-                </BrowserRouter>
-              </DocumentProvider>
-            </FeedbackProvider>
-          </LearningProvider>
-        </ToastProvider>
-      </AdminAuthProvider>
+      <GlobalErrorBoundary>
+        <AdminAuthProvider>
+          <ToastProvider>
+            <LearningProvider>
+              <FeedbackProvider>
+                <DocumentProvider>
+                  <BrowserRouter>
+                    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
+                      <MainRoutes />
+                      <ReloadPrompt />
+                    </div>
+                  </BrowserRouter>
+                </DocumentProvider>
+              </FeedbackProvider>
+            </LearningProvider>
+          </ToastProvider>
+        </AdminAuthProvider>
+      </GlobalErrorBoundary>
     </AuthProvider>
   );
 }

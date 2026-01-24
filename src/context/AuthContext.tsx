@@ -27,6 +27,9 @@ interface AuthContextType {
     getAllUsers: () => Promise<User[]>;
     getUserById: (id: string) => User | undefined;
     deleteUserById: (id: string) => Promise<{ success: boolean; message?: string }>;
+    // Password management
+    resetPassword: (email: string) => Promise<{ success: boolean; message?: string }>;
+    updatePassword: (password: string) => Promise<{ success: boolean; message?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -283,6 +286,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    // Password Reset
+    const resetPassword = async (email: string) => {
+        if (authMode === 'supabase') {
+            const result = await AuthService.requestPasswordReset(email);
+            return { success: result.success, message: result.error };
+        }
+        return { success: false, message: 'Bu özellik sadece çevrimiçi modda kullanılabilir.' };
+    };
+
+    // Update Password
+    const updatePassword = async (password: string) => {
+        if (authMode === 'supabase') {
+            const result = await AuthService.updatePassword(password);
+            return { success: result.success, message: result.error };
+        }
+        return { success: false, message: 'Bu özellik sadece çevrimiçi modda kullanılabilir.' };
+    };
+
     return (
         <AuthContext.Provider value={{
             user,
@@ -296,7 +317,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             isAuthenticated: !!user,
             getAllUsers,
             getUserById,
-            deleteUserById
+            deleteUserById,
+            resetPassword,
+            updatePassword
         }}>
             {children}
         </AuthContext.Provider>
