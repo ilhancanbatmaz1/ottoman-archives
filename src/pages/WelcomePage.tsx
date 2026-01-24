@@ -5,7 +5,7 @@ import { SEO } from '../components/SEO';
 import { useContent } from '../context/ContentContext';
 
 export const WelcomePage = () => {
-    const heroTitle = useContent('home_hero_title', 'Tarihin <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-500">Tozlu Sayfalarını</span> Aralayın');
+    const heroTitle = useContent('home_hero_title', 'Yapay Zekayla <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-500">Belgeleri</span> Çevirin!');
     const heroSubtitle = useContent('home_hero_subtitle', 'Osmanlıca arşiv belgelerini okumayı öğrenin, kendinizi geliştirin ve tarihe tanıklık edin. Yapay zeka destekli pratik araçlarıyla öğrenmek artık çok daha kolay.');
     const footerText = useContent('footer_text', '© 2026 Osmanlıca Okuma Yardımcısı. Tarihi sevdirmek için geliştirildi.');
 
