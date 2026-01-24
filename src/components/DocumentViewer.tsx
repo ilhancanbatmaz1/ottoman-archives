@@ -14,6 +14,7 @@ export const DocumentViewer = ({ doc }: Props) => {
     const [view, setView] = useState<'interactive' | 'fulltext' | 'practice'>('interactive');
     const [selectedWord, setSelectedWord] = useState<WordToken | null>(null);
     const [hoveredWord, setHoveredWord] = useState<WordToken | null>(null);
+    const [tooltipPosition, setTooltipPosition] = useState<{ x: number, y: number } | null>(null);
 
     // Learning context
     const { recordAttempt, toggleFavorite, isFavorite, addNote, getNote } = useLearning();
@@ -26,6 +27,20 @@ export const DocumentViewer = ({ doc }: Props) => {
     const [attemptedWords, setAttemptedWords] = useState<Map<string, boolean>>(new Map());
     const [showFullLine, setShowFullLine] = useState(false);
     const [zoomLevel, setZoomLevel] = useState(1);
+
+    const handleWordHover = (token: WordToken | null, e?: React.MouseEvent) => {
+        if (!token || !e) {
+            setHoveredWord(null);
+            return;
+        }
+
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        setTooltipPosition({
+            x: rect.left + rect.width / 2,
+            y: rect.top
+        });
+        setHoveredWord(token);
+    };
 
     // Download and Error Report states
     const { addErrorReport } = useFeedback();
@@ -191,15 +206,15 @@ export const DocumentViewer = ({ doc }: Props) => {
                                     </div>
                                 </div>
 
-                                <div className="relative rounded-xl overflow-visible shadow-lg border border-gray-200 bg-gray-50 group max-h-[600px]">
+                                <div className="relative rounded-xl overflow-auto shadow-lg border border-gray-200 bg-gray-50 group max-h-[600px]">
                                     <div style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left', transition: 'transform 0.2s ease' }}>
                                         <img src={doc.imageUrl} alt={doc.title} className="w-full h-auto block" />
                                         {doc.tokens.map((token) => token.coords && (
                                             <div
                                                 key={token.id}
                                                 onClick={() => setSelectedWord(token)}
-                                                onMouseEnter={() => setHoveredWord(token)}
-                                                onMouseLeave={() => setHoveredWord(null)}
+                                                onMouseEnter={(e) => handleWordHover(token, e)}
+                                                onMouseLeave={() => handleWordHover(null)}
                                                 className={`absolute cursor-pointer transition-all border-2 ${selectedWord?.id === token.id ? 'border-amber-600 bg-amber-600/30' : 'border-transparent hover:bg-white/10'}`}
                                                 style={{
                                                     left: `${token.coords.x}%`,
@@ -209,31 +224,6 @@ export const DocumentViewer = ({ doc }: Props) => {
                                                 }}
                                             />
                                         ))}
-
-                                        {/* Hover Tooltip (Inside scale container to follow zoom) */}
-                                        <AnimatePresence>
-                                            {hoveredWord && !selectedWord && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 5, scale: 0.9 }}
-                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                    exit={{ opacity: 0, scale: 0.9 }}
-                                                    transition={{ duration: 0.15 }}
-                                                    className="absolute z-50 pointer-events-none flex flex-col items-center"
-                                                    style={{
-                                                        left: `${hoveredWord.coords!.x + hoveredWord.coords!.width / 2}%`,
-                                                        top: `${hoveredWord.coords!.y}%`,
-                                                        transform: 'translate(-50%, -100%)',
-                                                        marginTop: '-8px' // Spacing
-                                                    }}
-                                                >
-                                                    <div className="bg-gray-900/95 backdrop-blur text-white text-xs rounded-xl py-2 px-4 shadow-xl border border-white/10 whitespace-nowrap flex flex-col items-center">
-                                                        <span className="font-medium text-amber-500 script-font text-lg leading-none mb-1">{hoveredWord.original}</span>
-                                                        <span className="font-bold">{hoveredWord.modern}</span>
-                                                    </div>
-                                                    <div className="w-2 h-2 bg-gray-900/95 transform rotate-45 -mt-1 border-r border-b border-white/10"></div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
                                     </div>
                                 </div>
                             </div>
@@ -588,6 +578,31 @@ export const DocumentViewer = ({ doc }: Props) => {
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* Floating Tooltip */}
+            <AnimatePresence>
+                {hoveredWord && !selectedWord && tooltipPosition && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 5, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.15 }}
+                        className="fixed z-[100] pointer-events-none flex flex-col items-center"
+                        style={{
+                            left: tooltipPosition.x,
+                            top: tooltipPosition.y,
+                            transform: 'translate(-50%, -100%)',
+                            marginTop: '-8px' // Spacing
+                        }}
+                    >
+                        <div className="bg-gray-900/95 backdrop-blur text-white text-xs rounded-xl py-2 px-4 shadow-xl border border-white/10 whitespace-nowrap flex flex-col items-center">
+                            <span className="font-medium text-amber-500 script-font text-lg leading-none mb-1">{hoveredWord.original}</span>
+                            <span className="font-bold">{hoveredWord.modern}</span>
+                        </div>
+                        <div className="w-2 h-2 bg-gray-900/95 transform rotate-45 -mt-1 border-r border-b border-white/10"></div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Hata Bildirimi Modalı */}
             {showErrorModal && selectedWord && (
