@@ -68,12 +68,19 @@ export class AuthService {
             };
         } catch (error: any) {
             console.error('Supabase signup error:', error);
+
+            let errorMessage = error.message;
+            if (errorMessage && (errorMessage.includes('rate limit') || errorMessage.includes('security purposes'))) {
+                errorMessage = 'Çok fazla deneme yaptınız. Lütfen biraz bekleyin veya Supabase panelinden e-posta onayını kapatın.';
+            }
+
             return {
                 success: false,
-                error: error.message || 'Kayıt sırasında bir hata oluştu'
+                error: errorMessage || 'Kayıt sırasında bir hata oluştu'
             };
         }
     }
+
 
     /**
      * Sign in with Supabase Auth
