@@ -8,6 +8,7 @@ import { DocumentProvider } from './context/DocumentContext';
 import { LearningProvider } from './context/LearningContext';
 import { FeedbackProvider } from './context/FeedbackContext';
 import { ToastProvider } from './context/ToastContext';
+import { ContentProvider } from './context/ContentContext';
 // Static imports removed for lazy loading
 import { ReloadPrompt } from './components/ReloadPrompt';
 import { HelmetProvider } from 'react-helmet-async';
@@ -312,15 +313,17 @@ function App() {
             <ToastProvider>
               <LearningProvider>
                 <FeedbackProvider>
-                  <DocumentProvider>
-                    <BrowserRouter>
-                      <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
-                        <InstallPrompt />
-                        <MainRoutes />
-                        <ReloadPrompt />
-                      </div>
-                    </BrowserRouter>
-                  </DocumentProvider>
+                  <ContentProvider>
+                    <DocumentProvider>
+                      <BrowserRouter>
+                        <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
+                          <InstallPrompt />
+                          <MainRoutes />
+                          <ReloadPrompt />
+                        </div>
+                      </BrowserRouter>
+                    </DocumentProvider>
+                  </ContentProvider>
                 </FeedbackProvider>
               </LearningProvider>
             </ToastProvider>
