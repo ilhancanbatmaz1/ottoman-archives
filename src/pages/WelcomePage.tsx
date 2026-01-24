@@ -8,27 +8,28 @@ export const WelcomePage = () => {
         <div className="min-h-screen bg-amber-50 text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
             <SEO title="Ana Sayfa" description="Osmanlı Türkçesi arşiv belgelerini okumayı öğrenmek için en kapsamlı platform. Orijinal belgelerle tarih yolculuğuna çıkın." />
             {/* Header */}
-            <nav className="w-full px-6 py-6 flex justify-between items-center max-w-7xl mx-auto">
+            {/* Header */}
+            <nav className="w-full px-4 sm:px-6 py-4 sm:py-6 flex flex-wrap justify-between items-center max-w-7xl mx-auto gap-4">
                 <div className="flex items-center gap-2">
-                    <div className="bg-amber-700 text-white p-2 rounded-xl shadow-lg shadow-amber-700/20">
-                        <Scroll size={24} />
+                    <div className="bg-amber-700 text-white p-1.5 sm:p-2 rounded-xl shadow-lg shadow-amber-700/20">
+                        <Scroll size={20} className="sm:w-6 sm:h-6" />
                     </div>
-                    <span className="text-xl font-bold tracking-tight text-gray-900">BELGE <span className="text-amber-700">OKUMA</span></span>
+                    <span className="text-lg sm:text-xl font-bold tracking-tight text-gray-900">BELGE <span className="text-amber-700">OKUMA</span></span>
                 </div>
-                <div className="flex gap-4 items-center">
+                <div className="flex gap-2 sm:gap-4 items-center">
                     <a
                         href="https://www.instagram.com/ilhanileosmanlica?igsh=MXkxOWE0YzR3OWwxMg=="
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-600 text-white font-bold text-xs hover:opacity-90 transition-opacity shadow-sm mr-2"
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-600 text-white font-bold text-xs hover:opacity-90 transition-opacity shadow-sm"
                     >
                         <Instagram size={14} />
                         <span className="hidden sm:inline">Takip Et</span>
                     </a>
-                    <Link to="/login" className="px-6 py-2.5 rounded-xl font-bold text-gray-600 hover:bg-white/50 hover:text-gray-900 transition-all">
-                        Giriş Yap
+                    <Link to="/login" className="px-3 py-2 sm:px-6 sm:py-2.5 text-sm sm:text-base rounded-xl font-bold text-gray-600 hover:bg-white/50 hover:text-gray-900 transition-all whitespace-nowrap">
+                        Giriş
                     </Link>
-                    <Link to="/signup" className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform">
+                    <Link to="/signup" className="px-3 py-2 sm:px-6 sm:py-2.5 text-sm sm:text-base bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform whitespace-nowrap">
                         Kayıt Ol
                     </Link>
                 </div>
