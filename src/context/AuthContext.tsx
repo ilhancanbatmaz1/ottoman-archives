@@ -189,12 +189,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Logout - supports both modes
     const logout = async () => {
-        if (authMode === 'supabase') {
-            await AuthService.signOutFromSupabase();
+        setIsLoading(true);
+        try {
+            if (authMode === 'supabase') {
+                await AuthService.signOutFromSupabase();
+            } else {
+                AuthService.logoutUser();
+            }
+        } finally {
             setUser(null);
-        } else {
-            setUser(null);
-            AuthService.logoutUser();
+            setIsLoading(false);
         }
     };
 

@@ -34,15 +34,7 @@ export const ArchiveGrid = ({ onSelect, filters }: Props) => {
                     year: filters.year !== 'Tümü' ? parseInt(filters.year) : undefined,
                 };
 
-                const start = performance.now();
                 const docs = await DocumentService.getAll(serviceFilters);
-                const end = performance.now();
-
-                // Add a minimum delay to prevent flickering (optional polish)
-                if (end - start < 300) {
-                    await new Promise(resolve => setTimeout(resolve, 300 - (end - start)));
-                }
-
                 setDocuments(docs);
             } catch (err) {
                 console.error('Belgeler yüklenirken hata:', err);
