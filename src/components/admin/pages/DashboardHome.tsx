@@ -1,14 +1,32 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users, FileText, BookOpen, AlertTriangle, TrendingUp, Activity } from 'lucide-react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth, type User } from '../../../context/AuthContext';
 import { useDocuments } from '../../../context/DocumentContext';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { StatCard } from '../StatCard';
 
 export const DashboardHome = () => {
-    const { users } = useAuth();
+    const { getAllUsers } = useAuth();
     const { documents } = useDocuments();
     const { errorReports, getPendingCount } = useFeedback();
+
+    const [users, setUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const fetchedUsers = await getAllUsers();
+                setUsers(fetchedUsers);
+            } catch (error) {
+                console.error('Failed to fetch dashboard stats', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchStats();
+    }, [getAllUsers]);
 
     // Calculate stats
     const totalUsers = users.length;
@@ -41,6 +59,12 @@ export const DashboardHome = () => {
                     </span>
                 </div>
             </div>
+
+            {isLoading && (
+                <div className="w-full h-1 bg-gray-100 overflow-hidden mb-6 rounded-full">
+                    <div className="h-full bg-blue-500 animate-[loading_1s_ease-in-out_infinite] w-full origin-left" style={{ transformOrigin: '0% 50%' }}></div>
+                </div>
+            )}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

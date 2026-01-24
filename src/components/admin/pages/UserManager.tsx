@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { UserCheck, Eye, Trash2 } from 'lucide-react';
 import { useAuth, type User } from '../../../context/AuthContext';
@@ -6,10 +6,42 @@ import { useToast } from '../../../context/ToastContext';
 import { DataTable, type Column } from '../DataTable';
 
 export const UserManager = () => {
-    const { users, deleteUserById } = useAuth();
+    const { getAllUsers, deleteUserById } = useAuth();
     const { showToast } = useToast();
+    const [users, setUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [deleteUserConfirmId, setDeleteUserConfirmId] = useState<string | null>(null);
+
+    // Fetch users on mount
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setIsLoading(true);
+            try {
+                const fetchedUsers = await getAllUsers();
+                setUsers(fetchedUsers);
+            } catch (error) {
+                console.error('Failed to fetch users:', error);
+                showToast('error', 'Kullanıcı listesi alınamadı');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchUsers();
+    }, [getAllUsers, showToast]);
+
+    const handleDeleteUser = async (id: string) => {
+        const result = await deleteUserById(id);
+        if (result.success) {
+            showToast('success', 'Kullanıcı silindi');
+            // Remove from local state immediately
+            setUsers(prev => prev.filter(u => u.id !== id));
+        } else {
+            showToast('error', result.message || 'Silme işlemi başarısız');
+        }
+        setDeleteUserConfirmId(null);
+    };
 
     const totalUsers = users.length;
 
@@ -61,7 +93,14 @@ export const UserManager = () => {
                     <span className="font-bold text-blue-900">{totalUsers} Kullanıcı</span>
                 </div>
             </div>
-            <DataTable data={users} columns={userColumns} keyExtractor={(user) => user.id} emptyMessage="Henüz kayıtlı kullanıcı yok" searchPlaceholder="Kullanıcı ara..." />
+
+            {isLoading ? (
+                <div className="flex justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+            ) : (
+                <DataTable data={users} columns={userColumns} keyExtractor={(user) => user.id} emptyMessage="Henüz kayıtlı kullanıcı yok" searchPlaceholder="Kullanıcı ara..." />
+            )}
 
             {/* User Details Modal */}
             {selectedUser && (
@@ -102,7 +141,7 @@ export const UserManager = () => {
                         </div>
                         <div className="flex gap-3">
                             <button onClick={() => setDeleteUserConfirmId(null)} className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">Vazgeç</button>
-                            <button onClick={async () => { await deleteUserById(deleteUserConfirmId); showToast('success', 'Kullanıcı silindi'); setDeleteUserConfirmId(null); }} className="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
+                            <button onClick={() => handleDeleteUser(deleteUserConfirmId)} className="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
                                 <Trash2 size={18} /> Evet, Sil
                             </button>
                         </div>
