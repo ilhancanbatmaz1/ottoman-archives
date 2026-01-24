@@ -33,7 +33,13 @@ export const DashboardHome = () => {
         <div className="space-y-6">
             <div className="mb-6">
                 <h1 className="text-3xl font-black text-gray-900 mb-2">Dashboard</h1>
-                <p className="text-gray-500">Sistem genel durumu ve istatistikler</p>
+                <div className="flex items-center gap-2 text-gray-500">
+                    <p>Sistem genel durumu ve istatistikler</p>
+                    <span className="text-gray-300">•</span>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_URL !== 'your-project-url-here' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_URL !== 'your-project-url-here' ? 'Supabase Bağlı' : 'Yerel Mod (LocalStorage)'}
+                    </span>
+                </div>
             </div>
 
             {/* Stats Grid */}
