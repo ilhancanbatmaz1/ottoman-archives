@@ -27,6 +27,7 @@ const AdminLogin = lazy(() => import('./components/admin/AdminLogin').then(modul
 const DashboardHome = lazy(() => import('./components/admin/pages/DashboardHome').then(module => ({ default: module.DashboardHome })));
 const UserManager = lazy(() => import('./components/admin/pages/UserManager').then(module => ({ default: module.UserManager })));
 const DocumentManager = lazy(() => import('./components/admin/pages/DocumentManager').then(module => ({ default: module.DocumentManager })));
+const ContentManager = lazy(() => import('./components/admin/pages/ContentManager'));
 const DocumentEdit = lazy(() => import('./components/admin/pages/DocumentEdit').then(module => ({ default: module.DocumentEdit })));
 const DocumentUpload = lazy(() => import('./components/admin/pages/DocumentUpload').then(module => ({ default: module.DocumentUpload })));
 const ReportManager = lazy(() => import('./components/admin/pages/ReportManager').then(module => ({ default: module.ReportManager })));
@@ -256,6 +257,13 @@ function MainRoutes() {
           <AdminProtectedRoute>
             <AdminLayout>
               <DocumentManager />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/content" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <ContentManager />
             </AdminLayout>
           </AdminProtectedRoute>
         } />
