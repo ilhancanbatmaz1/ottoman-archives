@@ -218,6 +218,21 @@ export const LearningProvider = ({ children }: { children: ReactNode }) => {
             else if (uniqueCorrectWords >= 150) newLevel = 'advanced';
             else if (uniqueCorrectWords >= 50) newLevel = 'intermediate';
 
+            // Sync to Supabase in background
+            if (user) {
+                LearningService.trackWord(original, modern, "", isCorrect ? 5 : 1).catch(console.error);
+
+                // Update Progress (Debounced or direct - direct is fine for now as attempts aren't super frequent)
+                LearningService.updateUserProgressInSupabase({
+                    total_words_learned: uniqueCorrectWords,
+                    current_streak: newStreak,
+                    // We don't track longest streak in local state properly, assuming current is longest if > longest
+                    // But we can just send current and let DB handle or just send current.
+                    // Ideally we should update the logic to track longest locally too.
+                    last_practice_date: new Date().toISOString()
+                }).catch(console.error);
+            }
+
             return {
                 ...prev,
                 totalCorrect: newCorrect,

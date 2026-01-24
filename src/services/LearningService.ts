@@ -317,11 +317,11 @@ export class LearningService {
     /**
      * Track word - auto-detects backend
      */
-    static async trackWord(ottoman: string, latin: string, translation: string): Promise<{ success: boolean }> {
+    static async trackWord(ottoman: string, latin: string, translation: string, masteryLevel = 1): Promise<{ success: boolean }> {
         const mode = AuthService.getAuthMode();
 
         if (mode === 'supabase') {
-            return await this.trackWordPracticeInSupabase(ottoman, latin, translation);
+            return await this.trackWordPracticeInSupabase(ottoman, latin, translation, masteryLevel);
         } else {
             const stats = this.getStats();
             stats.wordsLearned++;
