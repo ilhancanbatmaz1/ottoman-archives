@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&family=Amiri:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #1a1a1a;
+  --accent: #b45309;
+  --bg-main: #ffffff;
+  --bg-soft: #f9fafb;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  @apply bg-white text-gray-900 antialiased;
+}
+
+h1,
+h2,
+h3,
+.heading-font {
+  font-family: 'Playfair Display', serif;
+}
+
+.script-font {
+  font-family: 'Amiri', serif;
+  direction: rtl;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center gap-2 px-6 py-2 rounded-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-gray-900 text-white hover:bg-black;
+  }
+
+  .btn-outline {
+    @apply border border-gray-200 hover:border-amber-700 bg-transparent text-gray-900;
+  }
+
+  .card {
+    @apply bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-amber-700 transition-all shadow-sm hover:shadow-md;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-soft);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

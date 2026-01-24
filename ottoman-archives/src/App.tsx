@@ -1,0 +1,262 @@
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Scroll, ChevronDown, BookOpen, Lock, TrendingUp, Trophy, User, Power } from 'lucide-react';
+import { DocumentViewer } from './components/DocumentViewer';
+import { ArchiveGrid } from './components/ArchiveGrid';
+import { DocumentProvider } from './context/DocumentContext';
+import { LearningProvider } from './context/LearningContext';
+import { FeedbackProvider } from './context/FeedbackContext';
+import { ToastProvider } from './context/ToastContext';
+import { AdminLogin } from './components/admin/AdminLogin';
+import { AdminDashboard } from './components/admin/AdminDashboard';
+import { ProgressPage } from './pages/ProgressPage';
+import { DictionaryPage } from './pages/DictionaryPage';
+import { LeaderboardPage } from './pages/LeaderboardPage';
+import { ReloadPrompt } from './components/ReloadPrompt';
+import { LoginPage } from './pages/auth/LoginPage';
+import { SignupPage } from './pages/auth/SignupPage';
+import { WelcomePage } from './pages/WelcomePage';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { AdminAuthProvider } from './context/AdminAuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { AdminProtectedRoute } from './components/admin/AdminProtectedRoute';
+import type { ArchivalDocument } from './data/documents';
+
+function PublicApp() {
+  // Filters State
+  const [filterDifficulty, setFilterDifficulty] = useState('Tümü');
+  const [filterCategory, setFilterCategory] = useState('Tümü');
+  const [filterYear, setFilterYear] = useState('Tümü');
+
+  const [selectedDoc, setSelectedDoc] = useState<ArchivalDocument | null>(null);
+  const { user, logout } = useAuth();
+
+  return (
+    <>
+      {/* Sade Navigasyon */}
+      <nav className="sticky top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setSelectedDoc(null)}>
+            <div className="bg-amber-700 text-white p-1.5 rounded-lg">
+              <Scroll size={20} />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-gray-900">BELGE <span className="text-amber-700">OKUMA</span></span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Link to="/progress" className="flex items-center gap-1 text-gray-500 hover:text-amber-600 transition-colors">
+              <TrendingUp size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">İlerleme</span>
+            </Link>
+            <Link to="/leaderboard" className="flex items-center gap-1 text-gray-500 hover:text-purple-600 transition-colors">
+              <Trophy size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Sıralama</span>
+            </Link>
+
+            <div className="w-px h-6 bg-gray-200 mx-2" />
+
+            {user && (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                    <User size={16} className="text-amber-700" />
+                  </div>
+                  <span className="text-sm font-bold hidden md:inline">{user.username}</span>
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Çıkış Yap"
+                >
+                  <Power size={18} />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <AnimatePresence mode="wait">
+        {!selectedDoc ? (
+          <motion.div
+            key="browse"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <section className="pt-20 pb-16 px-6 text-center">
+              <div className="max-w-2xl mx-auto">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest mb-6 border border-amber-100">
+                  <BookOpen size={14} /> Ücretsiz Okuma Aracı
+                </div>
+                <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6 tracking-tight">
+                  Osmanlıca Arşiv<br />
+                  <span className="text-amber-700">Belgelerini Keşfedin</span>
+                </h1>
+                <p className="text-lg text-gray-600 mb-10 leading-relaxed">
+                  Gerçek arşiv belgeleri üzerinde okuma pratiği yapın, kelime hazinenizi geliştirin ve tarihe tanıklık edin.
+                </p>
+
+                {/* Arama ve Filtreleme */}
+                <div className="bg-white p-4 rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <div className="relative">
+                    <select
+                      value={filterDifficulty}
+                      onChange={(e) => setFilterDifficulty(e.target.value)}
+                      className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
+                    >
+                      <option>Tümü</option>
+                      <option>Kolay</option>
+                      <option>Orta</option>
+                      <option>Zor</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={filterCategory}
+                      onChange={(e) => setFilterCategory(e.target.value)}
+                      className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
+                    >
+                      <option>Tümü</option>
+                      <option>Siyasi</option>
+                      <option>Edebi</option>
+                      <option>Hukuki</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={filterYear}
+                      onChange={(e) => setFilterYear(e.target.value)}
+                      className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
+                    >
+                      <option>Tümü</option>
+                      <option>1895</option>
+                      <option>1908</option>
+                      <option>1915</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <ArchiveGrid
+              onSelect={setSelectedDoc}
+              filters={{
+                difficulty: filterDifficulty,
+                category: filterCategory,
+                year: filterYear
+              }}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="viewer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="h-[calc(100vh-80px)]"
+          >
+            <DocumentViewer doc={selectedDoc} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <footer className="border-t border-gray-100 py-12 text-center text-sm text-gray-400">
+        <p>© 2026 Osmanlıca Okuma Yardımcısı. <br className="sm:hidden" />Tarihi sevdirmek için geliştirildi.</p>
+        <div className="mt-4 flex justify-center">
+          <Link to="/admin" className="text-gray-300 hover:text-gray-500 transition-colors p-2">
+            <Lock size={14} />
+          </Link>
+        </div>
+      </footer>
+    </>
+  );
+}
+
+function MainRoutes() {
+  const { user } = useAuth();
+
+  return (
+    <Routes>
+      <Route path="/" element={user ? <PublicApp /> : <WelcomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+
+      {/* Admin Routes */}
+      <Route path="/admin" element={<AdminLogin />} />
+      <Route path="/admin/dashboard" element={
+        <AdminProtectedRoute>
+          <AdminDashboard />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/admin/users" element={
+        <AdminProtectedRoute>
+          <AdminDashboard />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/admin/documents" element={
+        <AdminProtectedRoute>
+          <AdminDashboard />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/admin/documents/new" element={
+        <AdminProtectedRoute>
+          <AdminDashboard />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/admin/reports" element={
+        <AdminProtectedRoute>
+          <AdminDashboard />
+        </AdminProtectedRoute>
+      } />
+
+      {/* Protected Routes */}
+      <Route path="/progress" element={
+        <ProtectedRoute>
+          <ProgressPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/dictionary" element={
+        <ProtectedRoute>
+          <DictionaryPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/leaderboard" element={
+        <ProtectedRoute>
+          <LeaderboardPage />
+        </ProtectedRoute>
+      } />
+    </Routes>
+  );
+}
+
+// Imports checked
+
+function App() {
+  return (
+    <AuthProvider>
+      <AdminAuthProvider>
+        <ToastProvider>
+          <LearningProvider>
+            <FeedbackProvider>
+              <DocumentProvider>
+                <BrowserRouter>
+                  <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
+                    <MainRoutes />
+                    <ReloadPrompt />
+                  </div>
+                </BrowserRouter>
+              </DocumentProvider>
+            </FeedbackProvider>
+          </LearningProvider>
+        </ToastProvider>
+      </AdminAuthProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
