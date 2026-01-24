@@ -1,50 +1,39 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, User, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { LoginSchema, type LoginFormData } from '../../lib/validation';
 import { SEO } from '../../components/SEO';
 
 export const LoginPage = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
+    const [submitError, setSubmitError] = useState('');
 
-    // Debug log to verify update
-    console.log('LoginPage rendered v2');
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
+        resolver: zodResolver(LoginSchema)
+    });
 
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!username || !password) {
-            setError('Lütfen tüm alanları doldurun');
-            return;
-        }
-
-        setIsLoading(true);
-        setError('');
-
+    const onSubmit = async (data: LoginFormData) => {
+        setSubmitError('');
         try {
-            const result = await login(username, password);
+            const result = await login(data.username, data.password);
             if (result.success) {
                 navigate('/progress');
             } else {
-                setError(result.message || 'Giriş başarısız');
+                setSubmitError(result.message || 'Giriş başarısız');
             }
         } catch (err) {
-            setError('Bir hata oluştu');
-        } finally {
-            setIsLoading(false);
+            setSubmitError('Bir hata oluştu');
         }
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex flex-col">
             <SEO title="Giriş Yap" description="Hesabınıza giriş yapın ve kaldığınız yerden devam edin." />
-            {/* Header */}
             <nav className="w-full p-6">
                 <Link to="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
                     <ArrowLeft size={20} />
@@ -66,26 +55,26 @@ export const LoginPage = () => {
                         <p className="text-gray-500 mt-2">Kaldığınız yerden devam etmek için giriş yapın</p>
                     </div>
 
-                    {error && (
+                    {submitError && (
                         <div className="bg-red-50 border border-red-100 rounded-lg p-3 flex items-start gap-3 mb-6">
                             <AlertCircle size={20} className="text-red-500 shrink-0 mt-0.5" />
-                            <p className="text-sm text-red-700">{error}</p>
+                            <p className="text-sm text-red-700">{submitError}</p>
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <div className="space-y-1">
                             <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Kullanıcı Adı</label>
                             <div className="relative">
                                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                                 <input
+                                    {...register('username')}
                                     type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                                    className={`w-full pl-12 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 outline-none transition-all ${errors.username ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-gray-200 focus:border-amber-500 focus:ring-amber-200'}`}
                                     placeholder="Kullanıcı adınız"
                                 />
                             </div>
+                            {errors.username && <p className="text-xs text-red-500 font-medium pl-1">{errors.username.message}</p>}
                         </div>
 
                         <div className="space-y-1">
@@ -93,13 +82,13 @@ export const LoginPage = () => {
                             <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                                 <input
+                                    {...register('password')}
                                     type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                                    className={`w-full pl-12 pr-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:ring-2 outline-none transition-all ${errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-gray-200 focus:border-amber-500 focus:ring-amber-200'}`}
                                     placeholder="••••••••"
                                 />
                             </div>
+                            {errors.password && <p className="text-xs text-red-500 font-medium pl-1">{errors.password.message}</p>}
                         </div>
 
                         <div className="flex justify-end mt-2 mb-4">
@@ -110,10 +99,10 @@ export const LoginPage = () => {
 
                         <button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={isSubmitting}
                             className="w-full py-4 bg-amber-600 text-white rounded-xl font-bold text-lg hover:bg-amber-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                         >
-                            {isLoading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+                            {isSubmitting ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
                         </button>
                     </form>
 

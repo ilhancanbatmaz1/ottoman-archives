@@ -3,13 +3,13 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scroll, ChevronDown, BookOpen, Lock, TrendingUp, Trophy, User, Power, Loader2 } from 'lucide-react';
 import { DocumentViewer } from './components/DocumentViewer';
-import { ArchiveGrid } from './components/ArchiveGrid';
 import { DocumentProvider } from './context/DocumentContext';
 import { LearningProvider } from './context/LearningContext';
 import { FeedbackProvider } from './context/FeedbackContext';
 import { ToastProvider } from './context/ToastContext';
 // Static imports removed for lazy loading
 import { ReloadPrompt } from './components/ReloadPrompt';
+import { HelmetProvider } from 'react-helmet-async';
 import { WelcomePage } from './pages/WelcomePage';
 import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -19,6 +19,7 @@ import { AdminProtectedRoute } from './components/admin/AdminProtectedRoute';
 import type { ArchivalDocument } from './data/documents';
 
 // Lazy Loaded Components
+const ArchiveGrid = lazy(() => import('./components/ArchiveGrid').then(module => ({ default: module.ArchiveGrid })));
 const AdminLogin = lazy(() => import('./components/admin/AdminLogin').then(module => ({ default: module.AdminLogin })));
 const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
 const ProgressPage = lazy(() => import('./pages/ProgressPage').then(module => ({ default: module.ProgressPage })));
@@ -159,14 +160,16 @@ function PublicApp() {
               </div>
             </section>
 
-            <ArchiveGrid
-              onSelect={setSelectedDoc}
-              filters={{
-                difficulty: filterDifficulty,
-                category: filterCategory,
-                year: filterYear
-              }}
-            />
+            <Suspense fallback={<PageLoader />}>
+              <ArchiveGrid
+                onSelect={setSelectedDoc}
+                filters={{
+                  difficulty: filterDifficulty,
+                  category: filterCategory,
+                  year: filterYear
+                }}
+              />
+            </Suspense>
           </motion.div>
         ) : (
           <motion.div
@@ -258,26 +261,28 @@ function MainRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <GlobalErrorBoundary>
-        <AdminAuthProvider>
-          <ToastProvider>
-            <LearningProvider>
-              <FeedbackProvider>
-                <DocumentProvider>
-                  <BrowserRouter>
-                    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
-                      <MainRoutes />
-                      <ReloadPrompt />
-                    </div>
-                  </BrowserRouter>
-                </DocumentProvider>
-              </FeedbackProvider>
-            </LearningProvider>
-          </ToastProvider>
-        </AdminAuthProvider>
-      </GlobalErrorBoundary>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <GlobalErrorBoundary>
+          <AdminAuthProvider>
+            <ToastProvider>
+              <LearningProvider>
+                <FeedbackProvider>
+                  <DocumentProvider>
+                    <BrowserRouter>
+                      <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
+                        <MainRoutes />
+                        <ReloadPrompt />
+                      </div>
+                    </BrowserRouter>
+                  </DocumentProvider>
+                </FeedbackProvider>
+              </LearningProvider>
+            </ToastProvider>
+          </AdminAuthProvider>
+        </GlobalErrorBoundary>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 
