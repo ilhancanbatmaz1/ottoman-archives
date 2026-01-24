@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import {
     LayoutDashboard, Users, FileText, MessageSquare, Plus,
-    Menu, X, LogOut, ChevronRight, LayoutTemplate
+    Menu, X, LogOut, ChevronRight, Type
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,7 +22,7 @@ const navItems: NavItem[] = [
     { path: '/admin/users', label: 'Kullanıcılar', icon: Users },
     { path: '/admin/documents', label: 'Belgeler', icon: FileText },
     { path: '/admin/documents/new', label: 'Yeni Belge', icon: Plus },
-    { path: '/admin/content', label: 'İçerik Yönetimi', icon: LayoutTemplate },
+    { path: '/admin/content', label: 'İçerik Yönetimi', icon: Type },
     { path: '/admin/reports', label: 'Hata Raporları', icon: MessageSquare },
 ];
 

@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useContentContext } from '../../../context/ContentContext';
 import { ContentService, type SiteContent } from '../../../services/ContentService';
-import { Loader2, Edit2, Check, X } from 'lucide-react';
+import { Loader2, Edit2, Check, X, AlertTriangle } from 'lucide-react';
 import { useToast } from '../../../context/ToastContext';
 
 export const ContentManager = () => {
-    const { refreshContent } = useContentContext();
+    // Debug Mode: If context fails, we want to know
+    const context = useContentContext();
+    const { refreshContent } = context;
     const { showToast } = useToast();
+
     const [contents, setContents] = useState<SiteContent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editValue, setEditValue] = useState('');
 
@@ -17,10 +21,17 @@ export const ContentManager = () => {
     }, []);
 
     const loadData = async () => {
-        setIsLoading(true);
-        const data = await ContentService.getAllContent();
-        setContents(data);
-        setIsLoading(false);
+        try {
+            setIsLoading(true);
+            const data = await ContentService.getAllContent();
+            setContents(data);
+            setError(null);
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || 'Veri yüklenirken hata oluştu');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleEdit = (item: SiteContent) => {
@@ -34,21 +45,21 @@ export const ContentManager = () => {
     };
 
     const handleSave = async (key: string) => {
-        const result = await ContentService.updateContent(key, editValue);
+        try {
+            const result = await ContentService.updateContent(key, editValue);
 
-        if (result.success) {
-            showToast('success', 'İçerik güncellendi');
-            setEditingKey(null);
-
-            // Update local list
-            setContents(prev => prev.map(item =>
-                item.key === key ? { ...item, value: editValue } : item
-            ));
-
-            // Refresh global context so changes appear on site
-            await refreshContent();
-        } else {
-            showToast('error', 'Hata: ' + result.error);
+            if (result.success) {
+                showToast('success', 'İçerik güncellendi');
+                setEditingKey(null);
+                setContents(prev => prev.map(item =>
+                    item.key === key ? { ...item, value: editValue } : item
+                ));
+                await refreshContent();
+            } else {
+                showToast('error', 'Hata: ' + result.error);
+            }
+        } catch (err: any) {
+            showToast('error', 'Beklenmedik hata: ' + err.message);
         }
     };
 
@@ -56,6 +67,19 @@ export const ContentManager = () => {
         return (
             <div className="flex justify-center items-center h-64">
                 <Loader2 className="w-8 h-8 text-amber-600 animate-spin" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-6 text-center">
+                <div className="bg-red-50 text-red-600 p-4 rounded-xl inline-block mb-4">
+                    <AlertTriangle size={32} />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Bir şeyler ters gitti</h3>
+                <p className="text-gray-600">{error}</p>
+                <button onClick={loadData} className="mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg">Tekrar Dene</button>
             </div>
         );
     }
@@ -131,6 +155,16 @@ export const ContentManager = () => {
                                 </tr>
                             ))}
                         </tbody>
+                        {contents.length === 0 && (
+                            <tbody className="divide-y divide-gray-100">
+                                <tr>
+                                    <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
+                                        <p>Henüz içerik bulunamadı veya veritabanı boş.</p>
+                                        <p className="text-xs mt-2 text-amber-600">Lütfen cms_setup.sql dosyasını çalıştırdığınızdan emin olun.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        )}
                     </table>
                 </div>
             </div>
