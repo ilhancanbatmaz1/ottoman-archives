@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ArchivalDocument, WordToken } from '../data/documents';
-import { BookOpen, MousePointerClick, X, Info, PenTool, Check, RotateCcw, Eye, EyeOff, ZoomIn, ZoomOut, RotateCw, Star, StickyNote, Download, AlertTriangle, Send } from 'lucide-react';
+import { BookOpen, MousePointerClick, X, Info, PenTool, Check, RotateCcw, Eye, EyeOff, ZoomIn, ZoomOut, RotateCw, Star, StickyNote, Download, AlertTriangle, Send, Share2 } from 'lucide-react';
 import { useLearning } from '../context/LearningContext';
 import { useFeedback } from '../context/FeedbackContext';
 import { SEO } from './SEO';
+
+import { ShareModal } from './ShareModal';
 
 interface Props {
     doc: ArchivalDocument;
@@ -15,6 +17,7 @@ export const DocumentViewer = ({ doc }: Props) => {
     const [selectedWord, setSelectedWord] = useState<WordToken | null>(null);
     const [hoveredWord, setHoveredWord] = useState<WordToken | null>(null);
     const [tooltipPosition, setTooltipPosition] = useState<{ x: number, y: number } | null>(null);
+    const [showShareModal, setShowShareModal] = useState(false);
 
     // Learning context
     const { recordAttempt, toggleFavorite, isFavorite, addNote, getNote } = useLearning();
@@ -177,6 +180,13 @@ export const DocumentViewer = ({ doc }: Props) => {
                     </button>
                 </div>
                 <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setShowShareModal(true)}
+                        className="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-gray-500 hover:bg-gray-200 transition-all"
+                        title="Paylaş"
+                    >
+                        <Share2 size={14} /> Paylaş
+                    </button>
                     <button
                         onClick={() => {
                             const link = document.createElement('a');
