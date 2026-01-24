@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import type { ArchivalDocument } from '../data/documents';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { useDocuments } from '../context/DocumentContext';
+import { Skeleton } from './Skeleton';
 
 interface Props {
     onSelect: (doc: ArchivalDocument) => void;
@@ -13,7 +14,31 @@ interface Props {
 }
 
 export const ArchiveGrid = ({ onSelect, filters }: Props) => {
-    const { documents } = useDocuments();
+    const { documents, loading } = useDocuments();
+
+    // Loading State
+    if (loading) {
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <Skeleton height={192} className="w-full" />
+                        <div className="p-6">
+                            <div className="flex gap-2 mb-3">
+                                <Skeleton width={60} height={20} />
+                                <Skeleton width={60} height={20} />
+                            </div>
+                            <Skeleton width="80%" height={28} className="mb-4" />
+                            <div className="flex justify-between pt-4 border-t border-gray-50">
+                                <Skeleton width={80} height={16} />
+                                <Skeleton width={60} height={16} />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    }
 
     const filteredDocs = documents.filter(doc => {
         // Filter by Difficulty

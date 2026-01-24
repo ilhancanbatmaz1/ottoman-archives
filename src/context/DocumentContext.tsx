@@ -4,41 +4,56 @@ import { DocumentService } from '../services/DocumentService';
 
 interface DocumentContextType {
     documents: ArchivalDocument[];
-    addDocument: (doc: ArchivalDocument) => void;
-    updateDocument: (id: string, updates: Partial<ArchivalDocument>) => void;
-    deleteDocument: (id: string) => void;
+    loading: boolean;
+    addDocument: (doc: ArchivalDocument) => Promise<void>;
+    updateDocument: (id: string, updates: Partial<ArchivalDocument>) => Promise<void>;
+    deleteDocument: (id: string) => Promise<void>;
+    refreshDocuments: () => Promise<void>;
 }
 
 const DocumentContext = createContext<DocumentContextType | undefined>(undefined);
 
 export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [documents, setDocuments] = useState<ArchivalDocument[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        setDocuments(DocumentService.getAllDocuments());
-    }, []);
-
-    const addDocument = (doc: ArchivalDocument) => {
-        DocumentService.saveDocument(doc);
-        setDocuments(DocumentService.getAllDocuments());
-    };
-
-    const deleteDocument = (id: string) => {
-        DocumentService.deleteDocument(id);
-        setDocuments(DocumentService.getAllDocuments());
-    };
-
-    const updateDocument = (id: string, updates: Partial<ArchivalDocument>) => {
-        const doc = DocumentService.getDocumentById(id);
-        if (doc) {
-            const updated = { ...doc, ...updates };
-            DocumentService.saveDocument(updated);
-            setDocuments(DocumentService.getAllDocuments());
+    const fetchDocuments = async () => {
+        try {
+            setLoading(true);
+            const docs = await DocumentService.getAll();
+            setDocuments(docs);
+        } catch (error) {
+            console.error('Failed to fetch documents', error);
+        } finally {
+            setLoading(false);
         }
     };
 
+    useEffect(() => {
+        fetchDocuments();
+    }, []);
+
+    const refreshDocuments = async () => {
+        await fetchDocuments();
+    };
+
+    const addDocument = async (doc: ArchivalDocument) => {
+        await DocumentService.create(doc);
+        await fetchDocuments();
+    };
+
+    const deleteDocument = async (id: string) => {
+        await DocumentService.delete(id);
+        await fetchDocuments();
+    };
+
+    const updateDocument = async (id: string, updates: Partial<ArchivalDocument>) => {
+        await DocumentService.update(id, updates);
+        await fetchDocuments();
+    };
+
     return (
-        <DocumentContext.Provider value={{ documents, addDocument, updateDocument, deleteDocument }}>
+        <DocumentContext.Provider value={{ documents, loading, addDocument, updateDocument, deleteDocument, refreshDocuments }}>
             {children}
         </DocumentContext.Provider>
     );
