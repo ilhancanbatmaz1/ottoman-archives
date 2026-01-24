@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scroll, ChevronDown, BookOpen, TrendingUp, Trophy, User, Power, Loader2 } from 'lucide-react';
 import { DocumentViewer } from './components/DocumentViewer';
+import { InstallPrompt } from './components/InstallPrompt';
 import { DocumentProvider } from './context/DocumentContext';
 import { LearningProvider } from './context/LearningContext';
 import { FeedbackProvider } from './context/FeedbackContext';
@@ -291,6 +292,7 @@ function App() {
                   <DocumentProvider>
                     <BrowserRouter>
                       <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
+                        <InstallPrompt />
                         <MainRoutes />
                         <ReloadPrompt />
                       </div>
