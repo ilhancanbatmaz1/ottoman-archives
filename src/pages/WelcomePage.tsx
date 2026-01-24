@@ -15,7 +15,16 @@ export const WelcomePage = () => {
                     </div>
                     <span className="text-xl font-bold tracking-tight text-gray-900">BELGE <span className="text-amber-700">OKUMA</span></span>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-4 items-center">
+                    <a
+                        href="https://www.instagram.com/ilhanileosmanlica?igsh=MXkxOWE0YzR3OWwxMg=="
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-600 text-white font-bold text-xs hover:opacity-90 transition-opacity shadow-sm mr-2"
+                    >
+                        <Instagram size={14} />
+                        <span className="hidden sm:inline">Takip Et</span>
+                    </a>
                     <Link to="/login" className="px-6 py-2.5 rounded-xl font-bold text-gray-600 hover:bg-white/50 hover:text-gray-900 transition-all">
                         Giriş Yap
                     </Link>
