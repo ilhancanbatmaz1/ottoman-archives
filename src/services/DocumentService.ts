@@ -141,6 +141,7 @@ export class DocumentService {
                     category: document.category || null,
                     year: document.year || null,
                     transcription: document.transcription || null,
+                    tokens: document.tokens || [], // Save tokens to JSONB column
                     uploaded_by: user?.id || null
                 })
                 .select()
@@ -168,6 +169,7 @@ export class DocumentService {
             if (updates.category !== undefined) updateData.category = updates.category;
             if (updates.year !== undefined) updateData.year = updates.year;
             if (updates.transcription !== undefined) updateData.transcription = updates.transcription;
+            if (updates.tokens !== undefined) updateData.tokens = updates.tokens;
 
             const { data, error } = await supabase
                 .from('documents')
@@ -298,7 +300,7 @@ export class DocumentService {
                     category: doc.category || 'Genel',
                     year: doc.year || undefined,
                     transcription: doc.transcription as any,
-                    tokens: []
+                    tokens: (doc as any).tokens || [] // Load tokens from DB
                 }));
             }
             return [];
@@ -338,7 +340,7 @@ export class DocumentService {
                     category: result.document.category || 'Genel',
                     year: result.document.year || undefined,
                     transcription: result.document.transcription as any,
-                    tokens: []
+                    tokens: (result.document as any).tokens || [] // Load tokens from DB
                 };
             }
             return null;
