@@ -20,8 +20,13 @@ import type { ArchivalDocument } from './data/documents';
 
 // Lazy Loaded Components
 const ArchiveGrid = lazy(() => import('./components/ArchiveGrid').then(module => ({ default: module.ArchiveGrid })));
+import { AdminLayout } from './components/admin/AdminLayout'; // Static import for Layout
 const AdminLogin = lazy(() => import('./components/admin/AdminLogin').then(module => ({ default: module.AdminLogin })));
-const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
+const DashboardHome = lazy(() => import('./components/admin/pages/DashboardHome').then(module => ({ default: module.DashboardHome })));
+const UserManager = lazy(() => import('./components/admin/pages/UserManager').then(module => ({ default: module.UserManager })));
+const DocumentManager = lazy(() => import('./components/admin/pages/DocumentManager').then(module => ({ default: module.DocumentManager })));
+const DocumentUpload = lazy(() => import('./components/admin/pages/DocumentUpload').then(module => ({ default: module.DocumentUpload })));
+const ReportManager = lazy(() => import('./components/admin/pages/ReportManager').then(module => ({ default: module.ReportManager })));
 const ProgressPage = lazy(() => import('./pages/ProgressPage').then(module => ({ default: module.ProgressPage })));
 const DictionaryPage = lazy(() => import('./pages/DictionaryPage').then(module => ({ default: module.DictionaryPage })));
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage').then(module => ({ default: module.LeaderboardPage })));
@@ -210,29 +215,41 @@ function MainRoutes() {
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLogin />} />
+
+        {/* Admin Pages wrapped in Layout */}
         <Route path="/admin/dashboard" element={
           <AdminProtectedRoute>
-            <AdminDashboard />
+            <AdminLayout>
+              <DashboardHome />
+            </AdminLayout>
           </AdminProtectedRoute>
         } />
         <Route path="/admin/users" element={
           <AdminProtectedRoute>
-            <AdminDashboard />
+            <AdminLayout>
+              <UserManager />
+            </AdminLayout>
           </AdminProtectedRoute>
         } />
         <Route path="/admin/documents" element={
           <AdminProtectedRoute>
-            <AdminDashboard />
+            <AdminLayout>
+              <DocumentManager />
+            </AdminLayout>
           </AdminProtectedRoute>
         } />
         <Route path="/admin/documents/new" element={
           <AdminProtectedRoute>
-            <AdminDashboard />
+            <AdminLayout>
+              <DocumentUpload />
+            </AdminLayout>
           </AdminProtectedRoute>
         } />
         <Route path="/admin/reports" element={
           <AdminProtectedRoute>
-            <AdminDashboard />
+            <AdminLayout>
+              <ReportManager />
+            </AdminLayout>
           </AdminProtectedRoute>
         } />
 

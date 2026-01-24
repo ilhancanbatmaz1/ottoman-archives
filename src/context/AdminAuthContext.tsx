@@ -24,7 +24,7 @@ export const useAdminAuth = () => {
 };
 
 // Configuration
-const ADMIN_PASSWORD_HASH = 'f2ca1bb6c7e907d06dafe4687e579fce76b37e4e93b7605022da52e6ccc26fd2'; // SHA-256 of "admin123"
+const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH || 'f2ca1bb6c7e907d06dafe4687e579fce76b37e4e93b7605022da52e6ccc26fd2'; // Default fallback if env not set
 const SESSION_TIMEOUT = 30 * 60 * 1000;
 
 export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
