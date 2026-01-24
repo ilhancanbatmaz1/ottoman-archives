@@ -55,287 +55,280 @@ function PublicApp() {
 
   const [selectedDoc, setSelectedDoc] = useState<ArchivalDocument | null>(null);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <>
       {/* Sade Navigasyon */}
       <nav className="sticky top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
-        import {useNavigate} from 'react-router-dom'; // Ensure this is imported
 
-        // ... inside PublicApp component
-        const navigate = useNavigate();
-
-        return (
-        <>
-          {/* Sade Navigasyon */}
-          <nav className="sticky top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
-            <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                {/* History Navigation */}
-                <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                  <button
-                    onClick={() => navigate(-1)}
-                    className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-md transition-all disabled:opacity-30"
-                    title="Geri"
-                  >
-                    <ChevronDown size={18} className="rotate-90" />
-                  </button>
-                  <div className="w-px h-4 bg-gray-300 mx-0.5" />
-                  <button
-                    onClick={() => navigate(1)}
-                    className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-md transition-all disabled:opacity-30"
-                    title="İleri"
-                  >
-                    <ChevronDown size={18} className="-rotate-90" />
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setSelectedDoc(null)}>
-                  <div className="bg-amber-700 text-white p-1.5 rounded-lg">
-                    <Scroll size={20} />
-                  </div>
-                  <span className="text-xl font-bold tracking-tight text-gray-900 hidden sm:inline">BELGE <span className="text-amber-700">OKUMA</span></span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <Link to="/progress" className="flex items-center gap-1 text-gray-500 hover:text-amber-600 transition-colors">
-                  <TrendingUp size={16} />
-                  <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">İlerleme</span>
-                </Link>
-                <Link to="/leaderboard" className="flex items-center gap-1 text-gray-500 hover:text-purple-600 transition-colors">
-                  <Trophy size={16} />
-                  <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Sıralama</span>
-                </Link>
-
-                <div className="w-px h-6 bg-gray-200 mx-2" />
-
-                {user && (
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                        <User size={16} className="text-amber-700" />
-                      </div>
-                      <span className="text-sm font-bold hidden md:inline">{user.username}</span>
-                    </div>
-                    <button
-                      onClick={logout}
-                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                      title="Çıkış Yap"
-                    >
-                      <Power size={18} />
-                    </button>
-                  </div>
-                )}
-              </div>
+        <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            {/* History Navigation */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-md transition-all disabled:opacity-30"
+                title="Geri"
+              >
+                <ChevronDown size={18} className="rotate-90" />
+              </button>
+              <div className="w-px h-4 bg-gray-300 mx-0.5" />
+              <button
+                onClick={() => navigate(1)}
+                className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-md transition-all disabled:opacity-30"
+                title="İleri"
+              >
+                <ChevronDown size={18} className="-rotate-90" />
+              </button>
             </div>
-          </nav>
 
-          <AnimatePresence mode="wait">
-            {!selectedDoc ? (
-              <motion.div
-                key="browse"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <section className="pt-20 pb-16 px-6 text-center">
-                  <div className="max-w-2xl mx-auto">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest mb-6 border border-amber-100">
-                      <BookOpen size={14} /> Ücretsiz Okuma Aracı
-                    </div>
-                    <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6 tracking-tight">
-                      Osmanlıca Arşiv<br />
-                      <span className="text-amber-700">Belgelerini Keşfedin</span>
-                    </h1>
-                    <p className="text-lg text-gray-600 mb-10 leading-relaxed">
-                      Gerçek arşiv belgeleri üzerinde okuma pratiği yapın, kelime hazinenizi geliştirin ve tarihe tanıklık edin.
-                    </p>
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => setSelectedDoc(null)}>
+              <div className="bg-amber-700 text-white p-1.5 rounded-lg">
+                <Scroll size={20} />
+              </div>
+              <span className="text-xl font-bold tracking-tight text-gray-900 hidden sm:inline">BELGE <span className="text-amber-700">OKUMA</span></span>
+            </div>
+          </div>
 
-                    {/* Arama ve Filtreleme */}
-                    <div className="bg-white p-4 rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-                      <div className="relative">
-                        <select
-                          value={filterDifficulty}
-                          onChange={(e) => setFilterDifficulty(e.target.value)}
-                          className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
-                        >
-                          <option>Tümü</option>
-                          <option>Kolay</option>
-                          <option>Orta</option>
-                          <option>Zor</option>
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
-                      </div>
-                      <div className="relative">
-                        <select
-                          value={filterCategory}
-                          onChange={(e) => setFilterCategory(e.target.value)}
-                          className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
-                        >
-                          <option>Tümü</option>
-                          <option>Siyasi</option>
-                          <option>Edebi</option>
-                          <option>Hukuki</option>
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
-                      </div>
-                      <div className="relative">
-                        <select
-                          value={filterYear}
-                          onChange={(e) => setFilterYear(e.target.value)}
-                          className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
-                        >
-                          <option>Tümü</option>
-                          <option>1895</option>
-                          <option>1908</option>
-                          <option>1915</option>
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
-                      </div>
-                    </div>
+          <div className="flex items-center gap-4">
+            <Link to="/progress" className="flex items-center gap-1 text-gray-500 hover:text-amber-600 transition-colors">
+              <TrendingUp size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">İlerleme</span>
+            </Link>
+            <Link to="/leaderboard" className="flex items-center gap-1 text-gray-500 hover:text-purple-600 transition-colors">
+              <Trophy size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Sıralama</span>
+            </Link>
+
+            <div className="w-px h-6 bg-gray-200 mx-2" />
+
+            {user && (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                    <User size={16} className="text-amber-700" />
                   </div>
-                </section>
-
-                <Suspense fallback={<PageLoader />}>
-                  <ArchiveGrid
-                    onSelect={setSelectedDoc}
-                    filters={{
-                      difficulty: filterDifficulty,
-                      category: filterCategory,
-                      year: filterYear
-                    }}
-                  />
-                </Suspense>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="viewer"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                className="h-[calc(100vh-80px)]"
-              >
-                <DocumentViewer doc={selectedDoc} />
-              </motion.div>
+                  <span className="text-sm font-bold hidden md:inline">{user.username}</span>
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Çıkış Yap"
+                >
+                  <Power size={18} />
+                </button>
+              </div>
             )}
-          </AnimatePresence>
+          </div>
+        </div>
+      </nav>
 
-          <footer className="border-t border-gray-100 py-12 text-center text-sm text-gray-400">
-            <p>© 2026 Osmanlıca Okuma Yardımcısı. <br className="sm:hidden" />Tarihi sevdirmek için geliştirildi.</p>
-          </footer>
-        </>
-        );
+      <AnimatePresence mode="wait">
+        {!selectedDoc ? (
+          <motion.div
+            key="browse"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <section className="pt-20 pb-16 px-6 text-center">
+              <div className="max-w-2xl mx-auto">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest mb-6 border border-amber-100">
+                  <BookOpen size={14} /> Ücretsiz Okuma Aracı
+                </div>
+                <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6 tracking-tight">
+                  Osmanlıca Arşiv<br />
+                  <span className="text-amber-700">Belgelerini Keşfedin</span>
+                </h1>
+                <p className="text-lg text-gray-600 mb-10 leading-relaxed">
+                  Gerçek arşiv belgeleri üzerinde okuma pratiği yapın, kelime hazinenizi geliştirin ve tarihe tanıklık edin.
+                </p>
+
+                {/* Arama ve Filtreleme */}
+                <div className="bg-white p-4 rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <div className="relative">
+                    <select
+                      value={filterDifficulty}
+                      onChange={(e) => setFilterDifficulty(e.target.value)}
+                      className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
+                    >
+                      <option>Tümü</option>
+                      <option>Kolay</option>
+                      <option>Orta</option>
+                      <option>Zor</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={filterCategory}
+                      onChange={(e) => setFilterCategory(e.target.value)}
+                      className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
+                    >
+                      <option>Tümü</option>
+                      <option>Siyasi</option>
+                      <option>Edebi</option>
+                      <option>Hukuki</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={filterYear}
+                      onChange={(e) => setFilterYear(e.target.value)}
+                      className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-amber-500 font-medium cursor-pointer"
+                    >
+                      <option>Tümü</option>
+                      <option>1895</option>
+                      <option>1908</option>
+                      <option>1915</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <Suspense fallback={<PageLoader />}>
+              <ArchiveGrid
+                onSelect={setSelectedDoc}
+                filters={{
+                  difficulty: filterDifficulty,
+                  category: filterCategory,
+                  year: filterYear
+                }}
+              />
+            </Suspense>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="viewer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="h-[calc(100vh-80px)]"
+          >
+            <DocumentViewer doc={selectedDoc} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <footer className="border-t border-gray-100 py-12 text-center text-sm text-gray-400">
+        <p>© 2026 Osmanlıca Okuma Yardımcısı. <br className="sm:hidden" />Tarihi sevdirmek için geliştirildi.</p>
+      </footer>
+    </>
+  );
 }
 
-        function MainRoutes() {
-  const {user} = useAuth();
+function MainRoutes() {
+  const { user } = useAuth();
 
-        return (
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={user ? <PublicApp /> : <WelcomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLogin />} />
-
-            {/* Admin Pages wrapped in Layout */}
-            <Route path="/admin/dashboard" element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <DashboardHome />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/users" element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <UserManager />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/documents" element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <DocumentManager />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/documents/edit/:id" element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <DocumentEdit />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/documents/new" element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <DocumentUpload />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/reports" element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <ReportManager />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            } />
-
-            {/* Protected Routes */}
-            <Route path="/progress" element={
-              <ProtectedRoute>
-                <ProgressPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/dictionary" element={
-              <ProtectedRoute>
-                <DictionaryPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/leaderboard" element={
-              <ProtectedRoute>
-                <LeaderboardPage />
-              </ProtectedRoute>
-            } />
-          </Routes>
-        </Suspense>
-        );
-}
-
-        // Imports checked
-
-        function App() {
   return (
-        <HelmetProvider>
-          <AuthProvider>
-            <GlobalErrorBoundary>
-              <AdminAuthProvider>
-                <ToastProvider>
-                  <LearningProvider>
-                    <FeedbackProvider>
-                      <DocumentProvider>
-                        <BrowserRouter>
-                          <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
-                            <InstallPrompt />
-                            <MainRoutes />
-                            <ReloadPrompt />
-                          </div>
-                        </BrowserRouter>
-                      </DocumentProvider>
-                    </FeedbackProvider>
-                  </LearningProvider>
-                </ToastProvider>
-              </AdminAuthProvider>
-            </GlobalErrorBoundary>
-          </AuthProvider>
-        </HelmetProvider>
-        );
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/" element={user ? <PublicApp /> : <WelcomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLogin />} />
+
+        {/* Admin Pages wrapped in Layout */}
+        <Route path="/admin/dashboard" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <DashboardHome />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/users" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <UserManager />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/documents" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <DocumentManager />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/documents/edit/:id" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <DocumentEdit />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/documents/new" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <DocumentUpload />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/reports" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <ReportManager />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+
+        {/* Protected Routes */}
+        <Route path="/progress" element={
+          <ProtectedRoute>
+            <ProgressPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/dictionary" element={
+          <ProtectedRoute>
+            <DictionaryPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/leaderboard" element={
+          <ProtectedRoute>
+            <LeaderboardPage />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </Suspense>
+  );
 }
 
-        export default App;
+// Imports checked
+
+function App() {
+  return (
+    <HelmetProvider>
+      <AuthProvider>
+        <GlobalErrorBoundary>
+          <AdminAuthProvider>
+            <ToastProvider>
+              <LearningProvider>
+                <FeedbackProvider>
+                  <DocumentProvider>
+                    <BrowserRouter>
+                      <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-amber-100 selection:text-amber-900">
+                        <InstallPrompt />
+                        <MainRoutes />
+                        <ReloadPrompt />
+                      </div>
+                    </BrowserRouter>
+                  </DocumentProvider>
+                </FeedbackProvider>
+              </LearningProvider>
+            </ToastProvider>
+          </AdminAuthProvider>
+        </GlobalErrorBoundary>
+      </AuthProvider>
+    </HelmetProvider>
+  );
+}
+
+export default App;
