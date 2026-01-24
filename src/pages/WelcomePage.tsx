@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Scroll, BookOpen, Star, Trophy, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Scroll, BookOpen, Star, Trophy, Users, ArrowRight, CheckCircle2, Instagram } from 'lucide-react';
 import { SEO } from '../components/SEO';
 
 export const WelcomePage = () => {
@@ -160,11 +160,22 @@ export const WelcomePage = () => {
             {/* Footer */}
             <footer className="bg-gray-900 text-white py-12 px-6">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2">
-                        <div className="bg-gray-800 p-2 rounded-lg">
-                            <Scroll size={20} />
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-gray-800 p-2 rounded-lg">
+                                <Scroll size={20} />
+                            </div>
+                            <span className="font-bold">Osmanlıca Okuma Yardımcısı</span>
                         </div>
-                        <span className="font-bold">Osmanlıca Okuma Yardımcısı</span>
+                        <a
+                            href="https://www.instagram.com/ilhanileosmanlica?igsh=MXkxOWE0YzR3OWwxMg=="
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                        >
+                            <Instagram size={18} />
+                            <span className="hidden sm:inline">@ilhanileosmanlica</span>
+                        </a>
                     </div>
                     <div className="text-gray-400 text-sm">
                         © 2026 Tüm hakları saklıdır. Tarihi sevdirmek için geliştirildi.
