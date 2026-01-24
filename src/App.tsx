@@ -1,27 +1,40 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scroll, ChevronDown, BookOpen, Lock, TrendingUp, Trophy, User, Power } from 'lucide-react';
+import { Scroll, ChevronDown, BookOpen, Lock, TrendingUp, Trophy, User, Power, Loader2 } from 'lucide-react';
 import { DocumentViewer } from './components/DocumentViewer';
 import { ArchiveGrid } from './components/ArchiveGrid';
 import { DocumentProvider } from './context/DocumentContext';
 import { LearningProvider } from './context/LearningContext';
 import { FeedbackProvider } from './context/FeedbackContext';
 import { ToastProvider } from './context/ToastContext';
-import { AdminLogin } from './components/admin/AdminLogin';
-import { AdminDashboard } from './components/admin/AdminDashboard';
-import { ProgressPage } from './pages/ProgressPage';
-import { DictionaryPage } from './pages/DictionaryPage';
-import { LeaderboardPage } from './pages/LeaderboardPage';
+// Static imports removed for lazy loading
 import { ReloadPrompt } from './components/ReloadPrompt';
-import { LoginPage } from './pages/auth/LoginPage';
-import { SignupPage } from './pages/auth/SignupPage';
 import { WelcomePage } from './pages/WelcomePage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminProtectedRoute } from './components/admin/AdminProtectedRoute';
 import type { ArchivalDocument } from './data/documents';
+
+// Lazy Loaded Components
+const AdminLogin = lazy(() => import('./components/admin/AdminLogin').then(module => ({ default: module.AdminLogin })));
+const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
+const ProgressPage = lazy(() => import('./pages/ProgressPage').then(module => ({ default: module.ProgressPage })));
+const DictionaryPage = lazy(() => import('./pages/DictionaryPage').then(module => ({ default: module.DictionaryPage })));
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage').then(module => ({ default: module.LeaderboardPage })));
+const LoginPage = lazy(() => import('./pages/auth/LoginPage').then(module => ({ default: module.LoginPage })));
+const SignupPage = lazy(() => import('./pages/auth/SignupPage').then(module => ({ default: module.SignupPage })));
+
+// Loading Component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="text-center">
+      <Loader2 className="w-10 h-10 text-amber-600 animate-spin mx-auto mb-4" />
+      <p className="text-gray-500 font-medium">Yükleniyor...</p>
+    </div>
+  </div>
+);
 
 function PublicApp() {
   // Filters State
@@ -181,56 +194,58 @@ function MainRoutes() {
   const { user } = useAuth();
 
   return (
-    <Routes>
-      <Route path="/" element={user ? <PublicApp /> : <WelcomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/" element={user ? <PublicApp /> : <WelcomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLogin />} />
-      <Route path="/admin/dashboard" element={
-        <AdminProtectedRoute>
-          <AdminDashboard />
-        </AdminProtectedRoute>
-      } />
-      <Route path="/admin/users" element={
-        <AdminProtectedRoute>
-          <AdminDashboard />
-        </AdminProtectedRoute>
-      } />
-      <Route path="/admin/documents" element={
-        <AdminProtectedRoute>
-          <AdminDashboard />
-        </AdminProtectedRoute>
-      } />
-      <Route path="/admin/documents/new" element={
-        <AdminProtectedRoute>
-          <AdminDashboard />
-        </AdminProtectedRoute>
-      } />
-      <Route path="/admin/reports" element={
-        <AdminProtectedRoute>
-          <AdminDashboard />
-        </AdminProtectedRoute>
-      } />
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={
+          <AdminProtectedRoute>
+            <AdminDashboard />
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/users" element={
+          <AdminProtectedRoute>
+            <AdminDashboard />
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/documents" element={
+          <AdminProtectedRoute>
+            <AdminDashboard />
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/documents/new" element={
+          <AdminProtectedRoute>
+            <AdminDashboard />
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/reports" element={
+          <AdminProtectedRoute>
+            <AdminDashboard />
+          </AdminProtectedRoute>
+        } />
 
-      {/* Protected Routes */}
-      <Route path="/progress" element={
-        <ProtectedRoute>
-          <ProgressPage />
-        </ProtectedRoute>
-      } />
-      <Route path="/dictionary" element={
-        <ProtectedRoute>
-          <DictionaryPage />
-        </ProtectedRoute>
-      } />
-      <Route path="/leaderboard" element={
-        <ProtectedRoute>
-          <LeaderboardPage />
-        </ProtectedRoute>
-      } />
-    </Routes>
+        {/* Protected Routes */}
+        <Route path="/progress" element={
+          <ProtectedRoute>
+            <ProgressPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/dictionary" element={
+          <ProtectedRoute>
+            <DictionaryPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/leaderboard" element={
+          <ProtectedRoute>
+            <LeaderboardPage />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </Suspense>
   );
 }
 
