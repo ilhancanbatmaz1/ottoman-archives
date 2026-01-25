@@ -429,7 +429,10 @@ export class AuthService {
         try {
             const url = import.meta.env.VITE_SUPABASE_URL;
             const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-            return !!(url && key && url !== 'your-project-url-here' && key !== 'your-anon-key-here');
+            return !!(url && key &&
+                url !== 'your-project-url-here' &&
+                key !== 'your-anon-key-here' &&
+                !url.includes('your-project-ref.supabase.co'));
         } catch {
             return false;
         }

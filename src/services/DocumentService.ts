@@ -165,7 +165,7 @@ export class DocumentService {
             if (updates.title !== undefined) updateData.title = updates.title;
             if (updates.description !== undefined) updateData.description = updates.description;
             if (updates.imageUrl !== undefined) updateData.image_url = updates.imageUrl;
-            if (updates.difficulty !== undefined) updateData.difficulty = updates.difficulty;
+            if (updates.difficulty !== undefined) updateData.difficulty = updates.difficulty.toLowerCase();
             if (updates.category !== undefined) updateData.category = updates.category;
             if (updates.year !== undefined) updateData.year = updates.year;
             if (updates.transcription !== undefined) updateData.transcription = updates.transcription;

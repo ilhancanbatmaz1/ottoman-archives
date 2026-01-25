@@ -48,7 +48,10 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     const updateDocument = async (id: string, updates: Partial<ArchivalDocument>) => {
-        await DocumentService.update(id, updates);
+        const result = await DocumentService.update(id, updates);
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to update document');
+        }
         await fetchDocuments();
     };
 
