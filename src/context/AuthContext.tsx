@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [authMode]);
 
     // Helper: Load Supabase user with profile data
-    const loadSupabaseUser = async (supabaseUser: SupabaseUser) => {
+    const loadSupabaseUser = async (supabaseUser: SupabaseUser): Promise<boolean> => {
         const profileResult = await AuthService.getUserProfile(supabaseUser.id);
 
         if (profileResult.success && profileResult.profile) {
@@ -108,7 +108,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 fullName: supabaseUser.user_metadata?.full_name || profile.username,
                 createdAt: new Date(profile.created_at).getTime()
             });
+            return true;
         }
+        return false;
     };
 
     // Login - supports both modes
@@ -118,8 +120,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const result = await AuthService.signInWithSupabase(usernameOrEmail, password);
 
             if (result.success && result.user) {
-                await loadSupabaseUser(result.user);
-                return { success: true };
+                const profileLoaded = await loadSupabaseUser(result.user);
+
+                if (profileLoaded) {
+                    return { success: true };
+                } else {
+                    // Auth success but no profile (Zombie user)
+                    await AuthService.signOutFromSupabase();
+                    return { success: false, message: 'Kullanıcı profili bulunamadı (Silinmiş olabilir)' };
+                }
             }
 
             return { success: false, message: result.error || 'Giriş yapılırken bir hata oluştu' };

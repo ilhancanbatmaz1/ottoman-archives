@@ -4,6 +4,7 @@ import { useDocuments } from '../../../context/DocumentContext';
 import { useToast } from '../../../context/ToastContext';
 import { CoordinatePicker } from '../../CoordinatePicker';
 import type { WordToken, WordCoords } from '../../../data/documents';
+import { supabase } from '../../../lib/supabase';
 
 export const DocumentUpload = () => {
     const { addDocument } = useDocuments();
@@ -14,6 +15,8 @@ export const DocumentUpload = () => {
     const [category, setCategory] = useState('Ferman');
     const [difficulty, setDifficulty] = useState<'Kolay' | 'Orta' | 'Zor'>('Orta');
     const [year, setYear] = useState<number>(1900);
+    const [uploading, setUploading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageFile, setImageFile] = useState<string | null>(null);
     const [tokens, setTokens] = useState<WordToken[]>([]);
     const [editingTokenId, setEditingTokenId] = useState<string | null>(null);
@@ -21,6 +24,19 @@ export const DocumentUpload = () => {
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            // Validation
+            if (file.size > 5 * 1024 * 1024) { // 5MB
+                showToast('error', 'Dosya boyutu 5MB\'dan küçük olmalıdır.');
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                showToast('error', 'Sadece resim dosyaları yüklenebilir.');
+                return;
+            }
+
+            setSelectedFile(file);
+
+            // Preview
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImageFile(reader.result as string);
@@ -51,34 +67,69 @@ export const DocumentUpload = () => {
         }
     };
 
-    const handleSave = () => {
-        if (!title || !imageFile) {
+    const uploadImageToSupabase = async (file: File): Promise<string> => {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from('document-images')
+            .upload(filePath, file);
+
+        if (uploadError) {
+            throw new Error(`Görsel yüklenemedi: ${uploadError.message}`);
+        }
+
+        const { data } = supabase.storage
+            .from('document-images')
+            .getPublicUrl(filePath);
+
+        return data.publicUrl;
+    };
+
+    const handleSave = async () => {
+        if (!title || !imageFile || !selectedFile) {
             showToast('error', 'Lütfen başlık ve görsel ekleyin.');
             return;
         }
 
-        addDocument({
-            id: Date.now().toString(),
-            title,
-            category,
-            difficulty,
-            year,
-            date: new Date().toLocaleDateString('tr-TR'),
-            description: 'Eklenen Belge',
-            imageUrl: imageFile,
-            tokens
-        });
+        try {
+            setUploading(true);
+            showToast('info', 'Görsel yükleniyor...');
 
-        showToast('success', 'Belge başarıyla kaydedildi!');
+            // 1. Upload Image to Supabase Storage
+            const publicUrl = await uploadImageToSupabase(selectedFile);
 
-        // Reset form
-        setTitle('');
-        setCategory('Ferman');
-        setDifficulty('Orta');
-        setYear(1900);
-        setImageFile(null);
-        setTokens([]);
-        setEditingTokenId(null);
+            // 2. Save Document Metadata
+            await addDocument({
+                id: Date.now().toString(),
+                title,
+                category,
+                difficulty,
+                year,
+                date: new Date().toLocaleDateString('tr-TR'),
+                description: 'Eklenen Belge',
+                imageUrl: publicUrl, // Use the real URL
+                tokens
+            });
+
+            showToast('success', 'Belge başarıyla yayınlandı!');
+
+            // Reset form
+            setTitle('');
+            setCategory('Ferman');
+            setDifficulty('Orta');
+            setYear(1900);
+            setImageFile(null);
+            setSelectedFile(null);
+            setTokens([]);
+            setEditingTokenId(null);
+        } catch (error: any) {
+            console.error('Save error:', error);
+            showToast('error', error.message || 'Belge kaydedilirken bir hata oluştu');
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
@@ -164,8 +215,12 @@ export const DocumentUpload = () => {
                         </div>
                     </div>
 
-                    <button onClick={handleSave} className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-black shadow-lg shadow-gray-200 flex items-center justify-center gap-2">
-                        <Save size={18} /> Belgeyi Yayınla
+                    <button onClick={handleSave} disabled={uploading} className={`w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-black shadow-lg shadow-gray-200 flex items-center justify-center gap-2 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        {uploading ? (
+                            <>Görsel Yükleniyor...</>
+                        ) : (
+                            <><Save size={18} /> Belgeyi Yayınla</>
+                        )}
                     </button>
                 </div>
             </div>
