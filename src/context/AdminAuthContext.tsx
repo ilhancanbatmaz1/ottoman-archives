@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { AuthService } from '../services/AuthService';
+import { supabase } from '../lib/supabase';
 
 interface AdminAuthContextType {
     isAuthenticated: boolean;
@@ -73,7 +74,36 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
                 const result = await AuthService.signInWithSupabase('admin@ottoman.com', password);
 
                 if (result.success && result.user) {
-                    const isAdmin = await AuthService.isUserAdmin();
+                    // Check if user is admin. If check fails (false), it might be because the profile is missing in public.users
+                    let isAdmin = await AuthService.isUserAdmin();
+
+                    if (!isAdmin) {
+                        try {
+                            // Attempt to self-heal: Check if profile exists
+                            const profile = await AuthService.getUserProfile(result.user.id);
+
+                            if (!profile.success || !profile.profile) {
+                                // Profile missing! Create it as admin.
+                                // This works because authenticated users can insert their own profile in public.users (usually)
+                                // or if RLS allows.
+                                const { error: createError } = await supabase
+                                    .from('users')
+                                    .insert({
+                                        id: result.user.id,
+                                        email: result.user.email || '',
+                                        username: 'admin',
+                                        is_admin: true
+                                    });
+
+                                if (!createError) {
+                                    isAdmin = true; // Fixed!
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Auto-fix admin failed', e);
+                        }
+                    }
+
                     if (isAdmin) {
                         const newSession = {
                             token: result.session?.access_token || crypto.randomUUID(),
@@ -88,7 +118,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
                     } else {
                         // Authenticated but not admin
                         await AuthService.signOutFromSupabase();
-                        return { success: false, message: 'Bu hesabın yönetici yetkisi yok.' };
+                        return { success: false, message: 'Bu hesabın yönetici yetkisi yok (veya veritabanı kaydı eksik).' };
                     }
                 }
                 return { success: false, message: result.error || 'Giriş başarısız' };

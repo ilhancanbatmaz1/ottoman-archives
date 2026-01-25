@@ -5,6 +5,7 @@ import { DocumentService } from '../services/DocumentService';
 interface DocumentContextType {
     documents: ArchivalDocument[];
     loading: boolean;
+    error: string | null;
     addDocument: (doc: ArchivalDocument) => Promise<void>;
     updateDocument: (id: string, updates: Partial<ArchivalDocument>) => Promise<void>;
     deleteDocument: (id: string) => Promise<void>;
@@ -16,14 +17,17 @@ const DocumentContext = createContext<DocumentContextType | undefined>(undefined
 export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [documents, setDocuments] = useState<ArchivalDocument[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchDocuments = async () => {
         try {
             setLoading(true);
+            setError(null);
             const docs = await DocumentService.getAll();
             setDocuments(docs);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to fetch documents', error);
+            setError(error.message || 'Belgeler yüklenirken bir hata oluştu');
         } finally {
             setLoading(false);
         }
@@ -56,7 +60,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     return (
-        <DocumentContext.Provider value={{ documents, loading, addDocument, updateDocument, deleteDocument, refreshDocuments }}>
+        <DocumentContext.Provider value={{ documents, loading, error, addDocument, updateDocument, deleteDocument, refreshDocuments }}>
             {children}
         </DocumentContext.Provider>
     );

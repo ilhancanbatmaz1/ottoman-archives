@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Trash2, AlertTriangle, Plus } from 'lucide-react';
+import { FileText, Trash2, AlertTriangle, Plus, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDocuments } from '../../../context/DocumentContext';
 import { useToast } from '../../../context/ToastContext';
 
 export const DocumentManager = () => {
-    const { documents, deleteDocument } = useDocuments();
+    const { documents, deleteDocument, error } = useDocuments();
     const { showToast } = useToast();
     const [deleteDocConfirmId, setDeleteDocConfirmId] = useState<string | null>(null);
 
@@ -17,11 +17,26 @@ export const DocumentManager = () => {
                     <h2 className="text-xl font-bold text-gray-900">Yayınlanmış Belgeler</h2>
                     <p className="text-gray-500 text-sm mt-1">Aşağıdaki belgeleri yönetebilirsiniz.</p>
                 </div>
-                <Link to="/admin/documents/new" className="px-4 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 transition-colors flex items-center gap-2">
-                    <Plus size={18} />
-                    Yeni Belge
-                </Link>
+                <div className="flex gap-2">
+                    <button onClick={() => window.location.reload()} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                        <RefreshCw size={20} />
+                    </button>
+                    <Link to="/admin/documents/new" className="px-4 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 transition-colors flex items-center gap-2">
+                        <Plus size={18} />
+                        Yeni Belge
+                    </Link>
+                </div>
             </div>
+
+            {error && (
+                <div className="bg-red-50 p-4 border-b border-red-100 flex items-center gap-3">
+                    <AlertTriangle className="text-red-600 shrink-0" size={24} />
+                    <div className="flex-1">
+                        <h3 className="font-bold text-red-900">Belgeler Yüklenemedi</h3>
+                        <p className="text-sm text-red-700">{error}</p>
+                    </div>
+                </div>
+            )}
 
             {documents.length === 0 ? (
                 <div className="p-16 text-center text-gray-400">
