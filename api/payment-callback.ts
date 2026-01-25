@@ -59,7 +59,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
                     if (error) {
                         console.error('Supabase Update Error:', error);
-                        res.redirect('/premium?status=error&message=db_update_failed');
+                        // EXPOSE ERROR DETAILS FOR DEBUGGING
+                        res.redirect(`/premium?status=error&message=${encodeURIComponent('DB Error: ' + JSON.stringify(error))}`);
                     } else {
                         // Success Redirect
                         res.redirect('/success?status=success');
