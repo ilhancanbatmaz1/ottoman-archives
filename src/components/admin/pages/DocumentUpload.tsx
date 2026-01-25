@@ -15,6 +15,7 @@ export const DocumentUpload = () => {
     const [category, setCategory] = useState('Ferman');
     const [difficulty, setDifficulty] = useState<'Kolay' | 'Orta' | 'Zor'>('Orta');
     const [year, setYear] = useState<number>(1900);
+    const [isPremium, setIsPremium] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageFile, setImageFile] = useState<string | null>(null);
@@ -110,6 +111,7 @@ export const DocumentUpload = () => {
                 date: new Date().toLocaleDateString('tr-TR'),
                 description: 'Eklenen Belge',
                 imageUrl: publicUrl, // Use the real URL
+                isPremium,
                 tokens
             });
 
@@ -120,6 +122,7 @@ export const DocumentUpload = () => {
             setCategory('Ferman');
             setDifficulty('Orta');
             setYear(1900);
+            setIsPremium(false);
             setImageFile(null);
             setSelectedFile(null);
             setTokens([]);
@@ -186,6 +189,20 @@ export const DocumentUpload = () => {
                             <label className="block text-xs font-bold uppercase text-gray-400 mb-2">Yıl</label>
                             <input type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-amber-500" placeholder="1900" />
                         </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                        <input
+                            type="checkbox"
+                            id="premium"
+                            checked={isPremium}
+                            onChange={e => setIsPremium(e.target.checked)}
+                            className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
+                        />
+                        <label htmlFor="premium" className="text-sm font-bold text-gray-700 select-none cursor-pointer flex items-center gap-2">
+                            <span>🔒 Premium İçerik</span>
+                            <span className="text-xs font-normal text-amber-600">(Sadece aboneler görebilir)</span>
+                        </label>
                     </div>
 
                     <div className="border-t border-gray-100 pt-6">

@@ -13,6 +13,16 @@ const ADMIN_SESSION_KEY = 'admin_session';
  * This service supports both Supabase Auth (production) and LocalStorage (fallback/development).
  * Uses dual-write pattern during migration to prevent data loss.
  */
+export interface UserProfile {
+    id: string;
+    email: string;
+    username: string;
+    created_at: string;
+    is_admin: boolean;
+    subscription_status?: 'free' | 'premium';
+    subscription_end_date?: string;
+}
+
 export class AuthService {
     // ========================================
     // SUPABASE AUTH METHODS (PRIMARY)
@@ -194,7 +204,7 @@ export class AuthService {
                 .single();
 
             if (error) throw error;
-            return { success: true, profile: data };
+            return { success: true, profile: data as UserProfile };
         } catch (error: any) {
             console.error('Error fetching profile:', error);
             return { success: false, error: error.message };

@@ -11,6 +11,8 @@ export interface User {
     email?: string; // Added for Supabase compatibility
     password?: string; // Only used internally for LocalStorage, never exposed in context
     createdAt: number;
+    subscriptionStatus?: 'free' | 'premium';
+    subscriptionEndDate?: string;
 }
 
 interface AuthContextType {
@@ -106,7 +108,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 email: profile.email,
                 username: profile.username,
                 fullName: supabaseUser.user_metadata?.full_name || profile.username,
-                createdAt: new Date(profile.created_at).getTime()
+                createdAt: new Date(profile.created_at).getTime(),
+                subscriptionStatus: profile.subscription_status || 'free',
+                subscriptionEndDate: profile.subscription_end_date
             });
             return true;
         }

@@ -5,6 +5,8 @@ import { BookOpen, MousePointerClick, X, Info, PenTool, Check, RotateCcw, Eye, E
 import { useLearning } from '../context/LearningContext';
 import { useFeedback } from '../context/FeedbackContext';
 import { SEO } from './SEO';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 import { ShareModal } from './ShareModal';
 
@@ -18,6 +20,16 @@ export const DocumentViewer = ({ doc }: Props) => {
     const [hoveredWord, setHoveredWord] = useState<WordToken | null>(null);
     const [tooltipPosition, setTooltipPosition] = useState<{ x: number, y: number } | null>(null);
     const [showShareModal, setShowShareModal] = useState(false);
+
+    // Auth & Premium Guard
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (doc.isPremium && user?.subscriptionStatus !== 'premium') {
+            navigate('/premium');
+        }
+    }, [doc, user, navigate]);
 
     // Learning context
     const { recordAttempt, toggleFavorite, isFavorite, addNote, getNote } = useLearning();

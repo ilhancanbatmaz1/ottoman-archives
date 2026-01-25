@@ -19,6 +19,7 @@ export const DocumentEdit = () => {
     const [category, setCategory] = useState('Ferman');
     const [difficulty, setDifficulty] = useState<'Kolay' | 'Orta' | 'Zor'>('Orta');
     const [year, setYear] = useState<number>(1900);
+    const [isPremium, setIsPremium] = useState(false);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null); // For new uploads
     const [tokens, setTokens] = useState<WordToken[]>([]);
@@ -34,6 +35,7 @@ export const DocumentEdit = () => {
                     setCategory(doc.category || 'Ferman');
                     setDifficulty(doc.difficulty as any);
                     setYear(doc.year || 1900);
+                    setIsPremium(doc.isPremium || false);
                     setImageUrl(doc.imageUrl);
                     setTokens(doc.tokens || []);
                 } else {
@@ -96,6 +98,7 @@ export const DocumentEdit = () => {
                 category,
                 difficulty,
                 year,
+                isPremium,
                 tokens,
                 // Only sending imageUrl if changed or same, but DocumentService handles update logic
                 ...(imageFile ? { imageUrl } : {})
@@ -175,6 +178,20 @@ export const DocumentEdit = () => {
                             <label className="block text-xs font-bold uppercase text-gray-400 mb-2">Yıl</label>
                             <input type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-amber-500" placeholder="1900" />
                         </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200 mt-4">
+                        <input
+                            type="checkbox"
+                            id="premium"
+                            checked={isPremium}
+                            onChange={e => setIsPremium(e.target.checked)}
+                            className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
+                        />
+                        <label htmlFor="premium" className="text-sm font-bold text-gray-700 select-none cursor-pointer flex items-center gap-2">
+                            <span>🔒 Premium İçerik</span>
+                            <span className="text-xs font-normal text-amber-600">(Sadece aboneler görebilir)</span>
+                        </label>
                     </div>
 
                     <div className="border-t border-gray-100 pt-6">

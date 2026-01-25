@@ -20,6 +20,7 @@ export interface ArchivalDocument {
     category: string; // Required for admin stats
     description?: string;
     imageUrl: string;
+    isPremium?: boolean;
     tokens: WordToken[]; // Required - default to [] if from Supabase
     transcription?: any; // JSONB field from Supabase
     difficulty: 'kolay' | 'orta' | 'zor' | 'Kolay' | 'Orta' | 'Zor'; // Required for admin stats

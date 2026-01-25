@@ -39,6 +39,7 @@ const SignupPage = lazy(() => import('./pages/auth/SignupPage').then(module => (
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage').then(module => ({ default: module.ForgotPasswordPage })));
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage').then(module => ({ default: module.ResetPasswordPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
+const PricingPage = lazy(() => import('./pages/PricingPage').then(module => ({ default: module.PricingPage })));
 
 // Loading Component
 const PageLoader = () => (
@@ -306,6 +307,7 @@ function MainRoutes() {
             <LeaderboardPage />
           </ProtectedRoute>
         } />
+        <Route path="/premium" element={<PricingPage />} />
 
         {/* 404 Route */}
         <Route path="*" element={<NotFoundPage />} />

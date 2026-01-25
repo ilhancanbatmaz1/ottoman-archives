@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { type ArchivalDocument } from '../data/documents';
-import { Calendar, ArrowRight, AlertCircle, Search } from 'lucide-react';
+import { Calendar, ArrowRight, AlertCircle, Search, Lock } from 'lucide-react';
 import { DocumentService } from '../services/DocumentService';
 import { Skeleton } from './Skeleton';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     onSelect: (doc: ArchivalDocument) => void;
@@ -20,6 +22,8 @@ export const ArchiveGrid = ({ onSelect, filters }: Props) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const { user } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFilteredDocuments = async () => {
@@ -92,6 +96,9 @@ export const ArchiveGrid = ({ onSelect, filters }: Props) => {
         );
     }
 
+    // Check if user has access to premium content
+    const hasPremiumAccess = user?.subscriptionStatus === 'premium';
+
     return (
         <div className="space-y-8">
             {/* Search Input */}
@@ -123,60 +130,91 @@ export const ArchiveGrid = ({ onSelect, filters }: Props) => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {filteredDocuments.map((doc, index) => (
-                        <motion.div
-                            key={doc.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            onClick={() => onSelect(doc)}
-                            className="group cursor-pointer bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-amber-700 transition-all shadow-sm hover:shadow-md"
-                        >
-                            <div className="h-48 overflow-hidden bg-gray-100 relative">
-                                <img
-                                    src={doc.imageUrl}
-                                    alt={doc.title}
-                                    className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
-                                    loading="lazy"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
+                    {filteredDocuments.map((doc, index) => {
+                        const isLocked = doc.isPremium && !hasPremiumAccess;
 
-                            <div className="p-6">
-                                <div className="flex flex-wrap items-center gap-2 mb-3">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
-                                        {doc.category}
-                                    </span>
-                                    {doc.difficulty && (
-                                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${doc.difficulty === 'Kolay' ? 'bg-green-50 text-green-700' :
-                                            doc.difficulty === 'Orta' ? 'bg-yellow-50 text-yellow-700' :
-                                                'bg-red-50 text-red-700'
-                                            }`}>
-                                            {doc.difficulty}
-                                        </span>
+                        return (
+                            <motion.div
+                                key={doc.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                onClick={() => {
+                                    if (isLocked) {
+                                        navigate('/premium');
+                                    } else {
+                                        onSelect(doc);
+                                    }
+                                }}
+                                className={`group cursor-pointer bg-white border rounded-xl overflow-hidden transition-all shadow-sm hover:shadow-md relative ${isLocked ? 'border-amber-200 opacity-90' : 'border-gray-100 hover:border-amber-700'
+                                    }`}
+                            >
+                                <div className="h-48 overflow-hidden bg-gray-100 relative">
+                                    <img
+                                        src={doc.imageUrl}
+                                        alt={doc.title}
+                                        className={`w-full h-full object-cover transition-all duration-500 ${isLocked ? 'grayscale blur-[2px]' : 'grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100'
+                                            }`}
+                                        loading="lazy"
+                                    />
+                                    {isLocked && (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                            <div className="bg-white/90 p-3 rounded-full shadow-lg">
+                                                <Lock size={24} className="text-amber-600" />
+                                            </div>
+                                        </div>
                                     )}
-                                    {doc.year && (
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
-                                            {doc.year}
-                                        </span>
+                                    {!isLocked && (
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                     )}
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-amber-800 transition-colors line-clamp-2">
-                                    {doc.title}
-                                </h3>
-                                <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-500 border-t border-gray-50 pt-4">
-                                    <span className="flex items-center gap-1.5">
-                                        <Calendar size={14} className="text-gray-400" /> {doc.date}
-                                    </span>
-                                    <span className="flex items-center gap-1.5 justify-end text-amber-600 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all">
-                                        İncele <ArrowRight size={14} />
-                                    </span>
+
+                                <div className="p-6">
+                                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                                        {doc.isPremium && (
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-white bg-amber-500 px-2 py-0.5 rounded flex items-center gap-1">
+                                                <Lock size={10} /> Premium
+                                            </span>
+                                        )}
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                                            {doc.category}
+                                        </span>
+                                        {doc.difficulty && (
+                                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${doc.difficulty === 'Kolay' ? 'bg-green-50 text-green-700' :
+                                                doc.difficulty === 'Orta' ? 'bg-yellow-50 text-yellow-700' :
+                                                    'bg-red-50 text-red-700'
+                                                }`}>
+                                                {doc.difficulty}
+                                            </span>
+                                        )}
+                                        {doc.year && (
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
+                                                {doc.year}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-amber-800 transition-colors line-clamp-2">
+                                        {doc.title}
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-500 border-t border-gray-50 pt-4">
+                                        <span className="flex items-center gap-1.5">
+                                            <Calendar size={14} className="text-gray-400" /> {doc.date}
+                                        </span>
+                                        <span className="flex items-center gap-1.5 justify-end text-amber-600 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all">
+                                            {isLocked ? (
+                                                <>Abone Ol <Lock size={14} /></>
+                                            ) : (
+                                                <>İncele <ArrowRight size={14} /></>
+                                            )}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                            </motion.div>
+                        );
+                    })}
                 </div>
             )}
         </div>
     );
 };
+
