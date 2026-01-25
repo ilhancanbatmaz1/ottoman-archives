@@ -129,6 +129,10 @@ export const PricingPage = () => {
                         <div className="mt-4 text-xs text-gray-500 flex items-center gap-1">
                             <Shield size={12} /> Güvenli Ödeme (Iyzico Altyapısı)
                         </div>
+                        {/* DEBUG USER ID */}
+                        <div className="mt-2 text-[10px] text-gray-300 font-mono">
+                            Ref: {user?.id || 'NO_USER_ID'}
+                        </div>
                     </div>
                 </div>
             </div>
