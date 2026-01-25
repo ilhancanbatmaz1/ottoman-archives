@@ -40,12 +40,14 @@ export const PricingPage = () => {
                 throw new Error(errorData.error?.errorMessage || errorData.error || 'Ödeme başlatılamadı.');
             }
 
-            const { url } = await response.json();
+            const data = await response.json();
+            const { paymentPageUrl } = data;
 
-            // Redirect to Stripe
-            if (url) {
-                window.location.href = url;
+            if (paymentPageUrl) {
+                window.location.href = paymentPageUrl;
             } else {
+                // DEBUG: Show what exactly returned
+                alert(`Ödeme Hatası: URL gelmedi.\nSunucu Yanıtı: ${JSON.stringify(data, null, 2)}`);
                 throw new Error('Ödeme sayfası URL\'i alınamadı.');
             }
 

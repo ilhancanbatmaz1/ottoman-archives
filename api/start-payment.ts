@@ -1,6 +1,7 @@
 
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import Iyzipay from 'iyzipay';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Iyzipay = require('iyzipay');
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') {
