@@ -112,8 +112,14 @@ export const LoginPage = () => {
                             Hemen Kayıt Olun
                         </Link>
                     </div>
+
+                    {/* Debug Info */}
+                    <div className="mt-4 text-center text-xs text-gray-400">
+                        System Mode: {import.meta.env.VITE_SUPABASE_URL ? 'Supabase Connected' : 'Local Storage'}
+                    </div>
                 </motion.div>
             </main>
-        </div>
+        </div >
     );
 };
+
