@@ -13,8 +13,8 @@ export const PricingPage = () => {
     const [loading, setLoading] = useState(false);
 
     const handleSubscribe = async () => {
-        if (!user) {
-            showToast('error', 'Abone olmak için önce giriş yapmalısınız.');
+        if (!user || !user.id || user.id === 'undefined') {
+            showToast('error', 'Oturum bilgisinde hata var. Lütfen çıkış yapıp tekrar girin.');
             navigate('/login');
             return;
         }

@@ -22,6 +22,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const { userId, email, userDetails } = req.body;
 
+        if (!userId || userId === 'undefined' || !email) {
+            return res.status(400).json({
+                error: 'Kullanıcı bilgileri eksik veya hatalı (ID: ' + userId + '). Lütfen tekrar giriş yapın.'
+            });
+        }
+
         const iyzipay = new Iyzipay({
             apiKey: process.env.IYZICO_API_KEY,
             secretKey: process.env.IYZICO_SECRET_KEY,
