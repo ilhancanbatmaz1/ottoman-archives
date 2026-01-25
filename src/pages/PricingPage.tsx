@@ -46,8 +46,6 @@ export const PricingPage = () => {
             if (paymentPageUrl) {
                 window.location.href = paymentPageUrl;
             } else {
-                // DEBUG: Show what exactly returned
-                alert(`Ödeme Hatası: URL gelmedi.\nSunucu Yanıtı: ${JSON.stringify(data, null, 2)}`);
                 throw new Error('Ödeme sayfası URL\'i alınamadı.');
             }
 
