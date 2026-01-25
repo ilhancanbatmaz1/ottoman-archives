@@ -142,7 +142,8 @@ export class DocumentService {
                     year: document.year || null,
                     transcription: document.transcription || null,
                     tokens: document.tokens || [], // Save tokens to JSONB column
-                    uploaded_by: user?.id || null
+                    uploaded_by: user?.id || null,
+                    is_premium: document.isPremium || false
                 })
                 .select()
                 .single();
@@ -170,6 +171,7 @@ export class DocumentService {
             if (updates.year !== undefined) updateData.year = updates.year;
             if (updates.transcription !== undefined) updateData.transcription = updates.transcription;
             if (updates.tokens !== undefined) updateData.tokens = updates.tokens;
+            if (updates.isPremium !== undefined) updateData.is_premium = updates.isPremium;
 
             const { data, error } = await supabase
                 .from('documents')
@@ -300,6 +302,7 @@ export class DocumentService {
                     category: doc.category || 'Genel',
                     year: doc.year || undefined,
                     transcription: doc.transcription as any,
+                    isPremium: doc.is_premium,
                     tokens: (doc as any).tokens || [] // Load tokens from DB
                 }));
             }
@@ -318,6 +321,7 @@ export class DocumentService {
                 docs = docs.filter(d => d.year === filters.year);
             }
 
+            console.log('Local Docs:', docs); // Debug log
             return docs;
         }
     }
@@ -331,6 +335,9 @@ export class DocumentService {
         if (mode === 'supabase') {
             const result = await this.getDocumentByIdFromSupabase(id);
             if (result.success && result.document) {
+                // Debug log
+                console.log('Supabase Doc:', result.document);
+
                 return {
                     id: result.document.id,
                     title: result.document.title,
@@ -340,6 +347,7 @@ export class DocumentService {
                     category: result.document.category || 'Genel',
                     year: result.document.year || undefined,
                     transcription: result.document.transcription as any,
+                    isPremium: result.document.is_premium,
                     tokens: (result.document as any).tokens || [] // Load tokens from DB
                 };
             }

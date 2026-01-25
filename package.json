@@ -14,8 +14,12 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@supabase/supabase-js": "^2.91.1",
+    "@vercel/node": "^5.5.27",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.27.5",
+    "iyzipay": "^2.0.64",
     "lucide-react": "^0.562.0",
+    "micro": "^10.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-helmet-async": "^2.0.5",

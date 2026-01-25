@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Check, Star, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { supabase } from '../lib/supabase';
+
 import { SEO } from '../components/SEO';
 
 export const PricingPage = () => {
@@ -19,36 +19,41 @@ export const PricingPage = () => {
             return;
         }
 
-        if (confirm('Test Modu: Bu işlem 50 TL ödeme alınmış gibi hesabınızı Premium yapacaktır. Onaylıyor musunuz?')) {
-            setLoading(true);
-            try {
-                // 1. Update user in DB
-                const { error } = await supabase
-                    .from('users')
-                    .update({
-                        subscription_status: 'premium',
-                        subscription_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
-                    } as any)
-                    .eq('id', user.id);
+        setLoading(true);
+        try {
+            const response = await fetch('/api/start-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: user.id,
+                    email: user.email,
+                    userDetails: {
+                        name: user.fullName || user.username,
+                    }
+                }),
+            });
 
-                if (error) throw error;
-
-                // 2. Force session refresh or manual re-login to update context
-                // Ideally we would have a 'refreshProfile' method in AuthContext, but re-login works too
-                showToast('success', 'Aboneliğiniz başarıyla başlatıldı! Hoş geldiniz.');
-
-                // Simple hack to refresh context: reload page or navigate to home
-                // A full refresh ensures AuthContext re-fetches the profile
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 1000);
-
-            } catch (err: any) {
-                console.error(err);
-                showToast('error', 'İşlem sırasında bir hata oluştu.');
-            } finally {
-                setLoading(false);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.errorMessage || errorData.error || 'Ödeme başlatılamadı.');
             }
+
+            const { url } = await response.json();
+
+            // Redirect to Stripe
+            if (url) {
+                window.location.href = url;
+            } else {
+                throw new Error('Ödeme sayfası URL\'i alınamadı.');
+            }
+
+        } catch (err: any) {
+            console.error(err);
+            showToast('error', err.message || 'Bir hata oluştu.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -122,7 +127,7 @@ export const PricingPage = () => {
                             </button>
                         </div>
                         <div className="mt-4 text-xs text-gray-500 flex items-center gap-1">
-                            <Shield size={12} /> Güvenli Ödeme (Stripe Altyapısı)
+                            <Shield size={12} /> Güvenli Ödeme (Iyzico Altyapısı)
                         </div>
                     </div>
                 </div>

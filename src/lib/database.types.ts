@@ -153,6 +153,7 @@ export interface Database {
                     uploaded_by: string | null
                     created_at: string
                     updated_at: string
+                    is_premium: boolean
                 }
                 Insert: {
                     id?: string
@@ -166,6 +167,7 @@ export interface Database {
                     uploaded_by?: string | null
                     created_at?: string
                     updated_at?: string
+                    is_premium?: boolean
                 }
                 Update: {
                     id?: string
@@ -179,6 +181,7 @@ export interface Database {
                     uploaded_by?: string | null
                     created_at?: string
                     updated_at?: string
+                    is_premium?: boolean
                 }
                 Relationships: [
                     {
