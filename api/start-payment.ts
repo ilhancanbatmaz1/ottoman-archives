@@ -22,9 +22,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const { userId, email, userDetails } = req.body;
 
-        if (!userId || userId === 'undefined' || !email) {
+        if (!userId || String(userId).toLowerCase().includes('undefined') || String(userId).trim() === '' || !email) {
             return res.status(400).json({
-                error: 'Kullanıcı bilgileri eksik veya hatalı (ID: ' + userId + '). Lütfen tekrar giriş yapın.'
+                error: 'Oturum hatası: Kullanıcı ID geçersiz (' + userId + '). Lütfen çıkış yapıp tekrar giriş yapın.'
             });
         }
 

@@ -42,7 +42,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 if (result.status === 'success' && result.paymentStatus === 'SUCCESS') {
                     const userId = result.conversationId;
 
-                    console.log(`Payment success for user: ${userId}`);
+                    console.log(`Payment success for user string: ${userId}`);
+
+                    // Validate UUID format
+                    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+                    if (!userId || !uuidRegex.test(userId)) {
+                        console.error('Invalid UUID received from Iyzico:', userId);
+                        res.redirect(`/premium?status=warning&message=${encodeURIComponent('Ödeme başarılı ancak kullanıcı ID hatası. Lütfen yönetici ile iletişime geçin. Ref: ' + userId)}`);
+                        return;
+                    }
 
                     // Calculate end date (30 days)
                     const endDate = new Date();
