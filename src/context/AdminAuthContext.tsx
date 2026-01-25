@@ -65,9 +65,40 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const login = async (password: string): Promise<{ success: boolean; message?: string }> => {
-        // Basic implementation for demonstration
-        const hashedPassword = await sha256(password);
+        // Mode 1: Supabase (Production)
+        if (AuthService.getAuthMode() === 'supabase') {
+            try {
+                // Hardcoded admin email for the single admin entry point
+                // User must have created this user in Supabase with the matching password
+                const result = await AuthService.signInWithSupabase('admin@ottoman.com', password);
 
+                if (result.success && result.user) {
+                    const isAdmin = await AuthService.isUserAdmin();
+                    if (isAdmin) {
+                        const newSession = {
+                            token: result.session?.access_token || crypto.randomUUID(),
+                            loginTime: Date.now(),
+                            lastActivity: Date.now(),
+                            userId: result.user.id
+                        };
+                        setSession(newSession);
+                        setIsAuthenticated(true);
+                        AuthService.setAdminSession(newSession);
+                        return { success: true };
+                    } else {
+                        // Authenticated but not admin
+                        await AuthService.signOutFromSupabase();
+                        return { success: false, message: 'Bu hesabın yönetici yetkisi yok.' };
+                    }
+                }
+                return { success: false, message: result.error || 'Giriş başarısız' };
+            } catch (error: any) {
+                return { success: false, message: error.message || 'Bağlantı hatası' };
+            }
+        }
+
+        // Mode 2: LocalStorage (Fallback/Dev)
+        const hashedPassword = await sha256(password);
         if (hashedPassword === ADMIN_PASSWORD_HASH) {
             const newSession = {
                 token: crypto.randomUUID(),
