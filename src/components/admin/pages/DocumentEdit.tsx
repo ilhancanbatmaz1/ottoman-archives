@@ -107,8 +107,8 @@ export const DocumentEdit = () => {
 
             showToast('success', 'Belge başarıyla güncellendi!');
             navigate('/admin/documents');
-        } catch (error) {
-            showToast('error', 'Güncelleme hatası');
+        } catch (error: any) {
+            showToast('error', error.message || 'Güncelleme hatası');
         }
     };
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
+import { AuthService } from '../../services/AuthService';
 import {
     LayoutDashboard, Users, FileText, MessageSquare, Plus,
     Menu, X, LogOut, ChevronRight, Type
@@ -133,6 +134,22 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 </nav>
 
                 {/* Footer/Logout */}
+                {/* Connection Status */}
+                <div className="px-4 py-3 mx-4 mb-2 bg-gray-800 rounded-lg">
+                    <div className="text-xs font-bold text-gray-400 uppercase mb-1">Bağlantı Modu</div>
+                    <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${AuthService.getAuthMode() === 'supabase' ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`} />
+                        <span className={`text-sm font-bold ${AuthService.getAuthMode() === 'supabase' ? 'text-green-400' : 'text-amber-400'}`}>
+                            {AuthService.getAuthMode() === 'supabase' ? 'Supabase (Live)' : 'LocalStorage'}
+                        </span>
+                    </div>
+                    {AuthService.getAuthMode() === 'localstorage' && (
+                        <p className="text-[10px] text-gray-500 mt-1 leading-tight">
+                            Canlı veritabanı için .env ayarlarını kontrol edin.
+                        </p>
+                    )}
+                </div>
+
                 <div className="p-4 border-t border-gray-800">
                     <button
                         onClick={handleLogout}
