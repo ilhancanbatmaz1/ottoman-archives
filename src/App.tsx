@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scroll, ChevronDown, BookOpen, TrendingUp, Trophy, User, Power, Loader2 } from 'lucide-react';
+import { Scroll, ChevronDown, BookOpen, TrendingUp, Trophy, User, Power, Loader2, Star } from 'lucide-react';
 import { DocumentViewer } from './components/DocumentViewer';
 import { InstallPrompt } from './components/InstallPrompt';
 import { DocumentProvider } from './context/DocumentContext';
@@ -103,6 +103,10 @@ function PublicApp() {
             <Link to="/leaderboard" className="flex items-center gap-1 text-gray-500 hover:text-purple-600 transition-colors">
               <Trophy size={16} />
               <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Sıralama</span>
+            </Link>
+            <Link to="/premium" className="flex items-center gap-1 text-amber-600 hover:text-amber-700 transition-colors bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
+              <Star size={14} className="fill-amber-600" />
+              <span className="text-xs font-bold uppercase tracking-wider">Premium</span>
             </Link>
 
             <div className="w-px h-6 bg-gray-200 mx-2" />
