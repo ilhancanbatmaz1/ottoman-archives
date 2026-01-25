@@ -1,4 +1,3 @@
-```typescript
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createRequire } from 'module';
 import { createClient } from '@supabase/supabase-js';
@@ -30,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             uri: process.env.IYZICO_BASE_URL || 'https://sandbox-api.iyzipay.com'
         });
 
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             iyzipay.checkoutForm.retrieve({ token }, async (err: any, result: any) => {
                 if (err) {
                     console.error('Iyzico Retrieve Error:', err);
@@ -41,9 +40,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 }
 
                 if (result.status === 'success' && result.paymentStatus === 'SUCCESS') {
-                    const userId = result.conversationId; // We stored userId here
+                    const userId = result.conversationId;
 
-                    console.log(`Payment success for user: ${ userId } `);
+                    console.log(`Payment success for user: ${userId}`);
 
                     // Calculate end date (30 days)
                     const endDate = new Date();
@@ -68,14 +67,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
                 } else {
                     console.error('Payment Failed:', result.errorMessage);
-                    res.redirect(`/ premium ? status = failed & message=${ encodeURIComponent(result.errorMessage) } `);
+                    res.redirect(`/premium?status=failed&message=${encodeURIComponent(result.errorMessage)}`);
                 }
                 resolve();
             });
         });
     } catch (err: any) {
         console.error('Critical Error in callback:', err);
-        res.redirect(`/ premium ? status = error & message=${ encodeURIComponent('Sunucu hatası: ' + err.message) } `);
+        res.redirect(`/premium?status=error&message=${encodeURIComponent('Sunucu hatası: ' + err.message)}`);
     }
 }
-```
