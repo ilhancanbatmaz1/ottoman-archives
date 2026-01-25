@@ -113,6 +113,11 @@ export const AdminLogin = () => {
                     </button>
                 </div>
             </div>
+            {/* DEBUG INFO: REMOVE IN PRODUCTION LATER */}
+            <div className="mt-8 text-center text-[10px] text-gray-300 font-mono">
+                System Status: {import.meta.env.VITE_SUPABASE_URL ? 'Online' : 'Offline'} <br />
+                Host: {import.meta.env.VITE_SUPABASE_URL?.slice(0, 15)}...
+            </div>
         </div>
     );
 };

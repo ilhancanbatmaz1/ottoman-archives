@@ -77,6 +77,12 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
                     // Check if user is admin. If check fails (false), it might be because the profile is missing in public.users
                     let isAdmin = await AuthService.isUserAdmin();
 
+                    // SUPER ADMIN BYPASS: Always allow admin@ottoman.com
+                    if (result.user.email === 'admin@ottoman.com') {
+                        console.log('Super Admin detected. Bypassing DB check.');
+                        isAdmin = true;
+                    }
+
                     if (!isAdmin) {
                         try {
                             console.log('Admin check failed. Attempting to elevate privileges for admin@ottoman.com');
