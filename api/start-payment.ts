@@ -41,7 +41,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             basketId: `B${Date.now()}`,
             paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
             callbackUrl: `${origin}/api/payment-callback`,
-            enabledInstallments: [2, 3, 6, 9],
             buyer: {
                 id: userId,
                 name: userDetails?.name || 'Misafir',
