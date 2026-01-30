@@ -143,9 +143,21 @@ export const PricingPage = () => {
                         <div className="mt-4 text-xs text-gray-500 flex items-center gap-1">
                             <Shield size={12} /> Güvenli Ödeme (Iyzico Altyapısı)
                         </div>
-                        {/* DEBUG USER ID */}
-                        <div className="mt-2 text-[10px] text-gray-300 font-mono">
-                            Ref: {user?.id || 'NO_USER_ID'}
+                        {/* DEBUG USER INFO - VISIBLE */}
+                        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-left">
+                            <p className="text-[10px] font-bold text-yellow-900 mb-1">DEBUG INFO:</p>
+                            <p className="text-[9px] text-yellow-800 font-mono break-all">
+                                User: {user ? 'Loaded' : 'NULL'}
+                            </p>
+                            <p className="text-[9px] text-yellow-800 font-mono break-all">
+                                ID: {user?.id || 'UNDEFINED'}
+                            </p>
+                            <p className="text-[9px] text-yellow-800 font-mono break-all">
+                                Email: {user?.email || 'UNDEFINED'}
+                            </p>
+                            <p className="text-[9px] text-yellow-800 font-mono break-all">
+                                Username: {user?.username || 'UNDEFINED'}
+                            </p>
                         </div>
                     </div>
                 </div>
