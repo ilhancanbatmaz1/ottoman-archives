@@ -13,13 +13,6 @@ export const PricingPage = () => {
     const [loading, setLoading] = useState(false);
 
     const handleSubscribe = async () => {
-        // Debug logging
-        console.log('=== PAYMENT DEBUG ===');
-        console.log('User object:', user);
-        console.log('User ID:', user?.id);
-        console.log('User email:', user?.email);
-        console.log('User type:', typeof user?.id);
-
         if (!user || !user.id || user.id === 'undefined' || String(user.id).trim() === '') {
             console.error('Invalid user ID detected:', user?.id);
             showToast('error', 'Oturum bilgisinde hata var. Lütfen çıkış yapıp tekrar girin.');
@@ -37,8 +30,6 @@ export const PricingPage = () => {
                 }
             };
 
-            console.log('Payment payload:', paymentPayload);
-
             const response = await fetch('/api/start-payment', {
                 method: 'POST',
                 headers: {
@@ -54,7 +45,6 @@ export const PricingPage = () => {
             }
 
             const data = await response.json();
-            console.log('Payment API response:', data);
             const { paymentPageUrl } = data;
 
             if (paymentPageUrl) {
@@ -142,22 +132,6 @@ export const PricingPage = () => {
                         </div>
                         <div className="mt-4 text-xs text-gray-500 flex items-center gap-1">
                             <Shield size={12} /> Güvenli Ödeme (Iyzico Altyapısı)
-                        </div>
-                        {/* DEBUG USER INFO - VISIBLE */}
-                        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-left">
-                            <p className="text-[10px] font-bold text-yellow-900 mb-1">DEBUG INFO:</p>
-                            <p className="text-[9px] text-yellow-800 font-mono break-all">
-                                User: {user ? 'Loaded' : 'NULL'}
-                            </p>
-                            <p className="text-[9px] text-yellow-800 font-mono break-all">
-                                ID: {user?.id || 'UNDEFINED'}
-                            </p>
-                            <p className="text-[9px] text-yellow-800 font-mono break-all">
-                                Email: {user?.email || 'UNDEFINED'}
-                            </p>
-                            <p className="text-[9px] text-yellow-800 font-mono break-all">
-                                Username: {user?.username || 'UNDEFINED'}
-                            </p>
                         </div>
                     </div>
                 </div>

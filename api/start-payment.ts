@@ -46,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             currency: Iyzipay.CURRENCY.TRY,
             basketId: `B${Date.now()}`,
             paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
-            callbackUrl: `${origin}/api/payment-callback`,
+            callbackUrl: `${origin}/payment-success`,
             buyer: {
                 id: userId,
                 name: userDetails?.name || 'Misafir',
@@ -89,8 +89,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         return new Promise<void>((resolve, reject) => {
             iyzipay.checkoutFormInitialize.create(request, (err: any, result: any) => {
-                console.log('Iyzico Response:', JSON.stringify(result)); // Log for debugging
-
                 if (err) {
                     console.error('Iyzico Init Error:', err);
                     res.status(500).json({ error: 'Iyzico bağlantı hatası: ' + JSON.stringify(err) });
