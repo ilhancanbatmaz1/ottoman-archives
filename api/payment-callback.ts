@@ -31,6 +31,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         return new Promise<void>((resolve, reject) => {
             iyzipay.checkoutForm.retrieve({ token }, async (err: any, result: any) => {
+                // COMPREHENSIVE DEBUG LOGGING
+                console.log('=== IYZICO CALLBACK DEBUG ===');
+                console.log('Error:', err);
+                console.log('Full Result:', JSON.stringify(result, null, 2));
+                console.log('Result keys:', result ? Object.keys(result) : 'null');
+                console.log('ConversationId:', result?.conversationId);
+                console.log('ConversationData:', result?.conversationData);
+                console.log('BasketId:', result?.basketId);
+
                 if (err) {
                     console.error('Iyzico Retrieve Error:', err);
                     // Redirect to error page
@@ -40,7 +49,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 }
 
                 if (result.status === 'success' && result.paymentStatus === 'SUCCESS') {
-                    const userId = result.conversationId;
+                    // Try multiple possible fields for user ID
+                    const userId = result.conversationId || result.conversationData || result.basketId?.replace('B', '');
 
                     console.log(`Payment success for user string: ${userId}`);
 
