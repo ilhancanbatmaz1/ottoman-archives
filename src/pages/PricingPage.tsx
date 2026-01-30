@@ -13,7 +13,15 @@ export const PricingPage = () => {
     const [loading, setLoading] = useState(false);
 
     const handleSubscribe = async () => {
-        if (!user || !user.id || user.id === 'undefined') {
+        // Debug logging
+        console.log('=== PAYMENT DEBUG ===');
+        console.log('User object:', user);
+        console.log('User ID:', user?.id);
+        console.log('User email:', user?.email);
+        console.log('User type:', typeof user?.id);
+
+        if (!user || !user.id || user.id === 'undefined' || String(user.id).trim() === '') {
+            console.error('Invalid user ID detected:', user?.id);
             showToast('error', 'Oturum bilgisinde hata var. Lütfen çıkış yapıp tekrar girin.');
             navigate('/login');
             return;
@@ -21,26 +29,32 @@ export const PricingPage = () => {
 
         setLoading(true);
         try {
+            const paymentPayload = {
+                userId: user.id,
+                email: user.email,
+                userDetails: {
+                    name: user.fullName || user.username,
+                }
+            };
+
+            console.log('Payment payload:', paymentPayload);
+
             const response = await fetch('/api/start-payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    userId: user.id,
-                    email: user.email,
-                    userDetails: {
-                        name: user.fullName || user.username,
-                    }
-                }),
+                body: JSON.stringify(paymentPayload),
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
+                console.error('Payment API error:', errorData);
                 throw new Error(errorData.error?.errorMessage || errorData.error || 'Ödeme başlatılamadı.');
             }
 
             const data = await response.json();
+            console.log('Payment API response:', data);
             const { paymentPageUrl } = data;
 
             if (paymentPageUrl) {
@@ -50,7 +64,7 @@ export const PricingPage = () => {
             }
 
         } catch (err: any) {
-            console.error(err);
+            console.error('Payment error:', err);
             showToast('error', err.message || 'Bir hata oluştu.');
         } finally {
             setLoading(false);
