@@ -313,7 +313,17 @@ export const DocumentViewer = ({ doc }: Props) => {
                                             <div className="h-[1px] bg-white/10" />
                                             <div>
                                                 <div className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest">Güncel Türkçe Karşılığı</div>
-                                                <div className="text-3xl font-bold text-white">{selectedWord.modern}</div>
+                                                <div className="relative group cursor-pointer" onClick={(e) => e.currentTarget.classList.toggle('revealed')}>
+                                                    <div className="text-3xl font-bold text-white/5 blur-md select-none transition-all group-hover:text-white/20 group-[.revealed]:text-white group-[.revealed]:blur-0 group-[.revealed]:select-text">
+                                                        {selectedWord.modern}
+                                                    </div>
+                                                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-start text-xs text-amber-500 font-bold uppercase tracking-wider group-[.revealed]:hidden pointer-events-none">
+                                                        <span className="bg-gray-800 px-3 py-1.5 rounded-full border border-amber-500/30 shadow-lg flex items-center gap-2">
+                                                            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                                                            Görmek için tıkla
+                                                        </span>
+                                                    </div>
+                                                </div>
                                                 {selectedWord.note && <div className="text-base text-gray-400 mt-3 italic bg-white/5 p-3 rounded-lg border border-white/10">"{selectedWord.note}"</div>}
                                             </div>
                                             <div className="pt-4 border-t border-white/10 flex gap-2 flex-col">
@@ -810,6 +820,7 @@ export const DocumentViewer = ({ doc }: Props) => {
 
             {/* AI Assistant */}
             <AIAssistant
+                ref={aiAssistantRef}
                 documentTitle={doc.title}
                 documentContext={`
 BAŞLIK: ${doc.title}
