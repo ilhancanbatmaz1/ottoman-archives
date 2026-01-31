@@ -320,6 +320,16 @@ export const DocumentViewer = ({ doc }: Props) => {
                                                 <button
                                                     onClick={() => {
                                                         if (aiAssistantRef.current && selectedWord) {
+                                                            aiAssistantRef.current.ask(`"${selectedWord.original}" (${selectedWord.modern}) kelimesinin Osmanlıca matbu (basılı) halini yaz ve harflerini tek tek incele.`);
+                                                        }
+                                                    }}
+                                                    className="w-full py-3 px-4 bg-teal-600 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-teal-500 transition-colors"
+                                                >
+                                                    <BookOpen size={16} /> Matbu Halini Göster
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        if (aiAssistantRef.current && selectedWord) {
                                                             aiAssistantRef.current.ask(`"${selectedWord.original}" (${selectedWord.modern}) kelimesinin kökeni nedir? Hangi dilden geçmiştir? Kısaca bilgi ver, gramer ayrımı yapma.`);
                                                         }
                                                     }}

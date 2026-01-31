@@ -283,11 +283,27 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
 
                                     <div
                                         className={`max-w-[85%] ${msg.isQuiz ? 'w-full' : ''} ${msg.role === 'user'
-                                                ? 'bg-amber-600 text-white p-3 rounded-2xl rounded-br-none shadow-md'
-                                                : 'bg-white text-gray-800 shadow-md border border-gray-100 rounded-2xl rounded-bl-none p-3'
+                                            ? 'bg-amber-600 text-white p-3 rounded-2xl rounded-br-none shadow-md'
+                                            : 'bg-white text-gray-800 shadow-md border border-gray-100 rounded-2xl rounded-bl-none p-3'
                                             }`}
                                     >
-                                        {msg.text}
+                                        {msg.isQuiz ? (
+                                            msg.text
+                                        ) : (
+                                            <div className="whitespace-pre-wrap">
+                                                {msg.text.split(/([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+)/g).map((part, i) => {
+                                                    // Check if part is Arabic script
+                                                    if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(part)) {
+                                                        return (
+                                                            <span key={i} className="font-serif text-2xl mx-1 text-amber-900 leading-loose" dir="rtl">
+                                                                {part}
+                                                            </span>
+                                                        );
+                                                    }
+                                                    return part;
+                                                })}
+                                            </div>
+                                        )}
                                         {msg.isQuiz && msg.quizData && (
                                             <div className="mt-2">
                                                 {msg.quizData.map((q, idx) => (
