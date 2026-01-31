@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 import { ShareModal } from './ShareModal';
+import { AIAssistant } from './AIAssistant';
 
 interface Props {
     doc: ArchivalDocument;
@@ -783,6 +784,22 @@ export const DocumentViewer = ({ doc }: Props) => {
                 onClose={() => setShowShareModal(false)}
                 title={doc.title}
                 url={window.location.href}
+            />
+
+            {/* AI Assistant */}
+            <AIAssistant
+                documentTitle={doc.title}
+                documentContext={`
+BAŞLIK: ${doc.title}
+KATEGORİ: ${doc.category || 'Belirtilmemiş'}
+ZORLUK: ${doc.difficulty || 'Belirtilmemiş'}
+
+TRANSKRİPSİYON (METİN):
+${doc.tokens.map(t => t.original).join(' ')}
+
+MODERN TÜRKÇE KARŞILIĞI:
+${doc.tokens.map(t => t.modern).join(' ')}
+                `.trim()}
             />
         </div>
     );
