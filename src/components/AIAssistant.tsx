@@ -166,12 +166,20 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
                             {messages.map((msg) => (
                                 <div
                                     key={msg.id}
-                                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                    className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                 >
+                                    {msg.role === 'model' && (
+                                        <img
+                                            src="/mr_osmanlica.png"
+                                            alt="Mr. Osmanlıca"
+                                            className="w-8 h-8 rounded-full border border-gray-200 bg-amber-50 object-cover mb-1 shadow-sm shrink-0"
+                                        />
+                                    )}
+
                                     <div
-                                        className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                                            ? 'bg-amber-600 text-white rounded-tr-none shadow-sm'
-                                            : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-tl-none'
+                                        className={`max-w-[75%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
+                                                ? 'bg-amber-600 text-white rounded-br-none shadow-md'
+                                                : 'bg-white text-gray-800 shadow-md border border-gray-100 rounded-bl-none'
                                             }`}
                                     >
                                         {msg.text}
