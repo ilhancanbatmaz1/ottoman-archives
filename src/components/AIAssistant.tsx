@@ -22,7 +22,7 @@ export interface AIAssistantHandle {
 // Pre-defined quick suggestions
 const SUGGESTED_PROMPTS = [
     "Bu belgeyi özetle",
-    "Günümüz Türkçesine çevir",
+    "Beni bu belgeyle ilgili test et (3 soru)",
     "Zor kelimeleri açıkla",
     "Belgenin türü nedir?"
 ];
@@ -113,7 +113,7 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
                 onClick={() => setIsOpen(!isOpen)}
                 className={`fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-colors ${isOpen ? 'bg-red-500 hover:bg-red-600' : 'bg-amber-600 hover:bg-amber-700'
                     } text-white`}
-                title={isOpen ? "Asistanı Kapat" : "AI Asistan"}
+                title={isOpen ? "Asistanı Kapat" : "Mr. Osmanlıca"}
             >
                 {isOpen ? <X size={24} /> : <Sparkles size={24} />}
             </motion.button>
@@ -132,7 +132,7 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
                             <div className="flex items-center gap-2">
                                 <Bot size={20} />
                                 <div>
-                                    <h3 className="font-bold">AI Asistan</h3>
+                                    <h3 className="font-bold">Mr. Osmanlıca 🎩</h3>
                                     <p className="text-xs text-amber-100 opacity-80 line-clamp-1">{documentTitle}</p>
                                 </div>
                             </div>
@@ -159,8 +159,8 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
                                 >
                                     <div
                                         className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                                                ? 'bg-amber-600 text-white rounded-tr-none shadow-sm'
-                                                : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-tl-none'
+                                            ? 'bg-amber-600 text-white rounded-tr-none shadow-sm'
+                                            : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-tl-none'
                                             }`}
                                     >
                                         {msg.text}
