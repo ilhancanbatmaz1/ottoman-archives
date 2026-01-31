@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ArchivalDocument, WordToken } from '../data/documents';
-import { BookOpen, MousePointerClick, X, Info, PenTool, Check, RotateCcw, Eye, EyeOff, ZoomIn, ZoomOut, RotateCw, Star, StickyNote, Download, AlertTriangle, Send, Share2 } from 'lucide-react';
+import { BookOpen, MousePointerClick, X, Info, PenTool, Check, RotateCcw, Eye, EyeOff, ZoomIn, ZoomOut, RotateCw, Star, StickyNote, Download, AlertTriangle, Send, Share2, Sparkles } from 'lucide-react';
 import { useLearning } from '../context/LearningContext';
 import { useFeedback } from '../context/FeedbackContext';
 import { SEO } from './SEO';
@@ -9,13 +9,14 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 import { ShareModal } from './ShareModal';
-import { AIAssistant } from './AIAssistant';
+import { AIAssistant, type AIAssistantHandle } from './AIAssistant';
 
 interface Props {
     doc: ArchivalDocument;
 }
 
 export const DocumentViewer = ({ doc }: Props) => {
+    const aiAssistantRef = useRef<AIAssistantHandle>(null);
     const [view, setView] = useState<'interactive' | 'fulltext' | 'practice'>('interactive');
     const [selectedWord, setSelectedWord] = useState<WordToken | null>(null);
     const [hoveredWord, setHoveredWord] = useState<WordToken | null>(null);
@@ -315,7 +316,18 @@ export const DocumentViewer = ({ doc }: Props) => {
                                                 <div className="text-3xl font-bold text-white">{selectedWord.modern}</div>
                                                 {selectedWord.note && <div className="text-base text-gray-400 mt-3 italic bg-white/5 p-3 rounded-lg border border-white/10">"{selectedWord.note}"</div>}
                                             </div>
-                                            <div className="pt-4 border-t border-white/10">
+                                            <div className="pt-4 border-t border-white/10 flex gap-2 flex-col">
+                                                <button
+                                                    onClick={() => {
+                                                        if (aiAssistantRef.current && selectedWord) {
+                                                            aiAssistantRef.current.ask(`"${selectedWord.original}" (${selectedWord.modern}) kelimesinin kökeni nedir? Hangi dilden geçmiştir? Kısaca bilgi ver, gramer ayrımı yapma.`);
+                                                        }
+                                                    }}
+                                                    className="w-full py-3 px-4 bg-amber-600 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-amber-500 transition-colors"
+                                                >
+                                                    <Sparkles size={16} /> Kökenini Gör
+                                                </button>
+
                                                 <button
                                                     onClick={() => setShowErrorModal(true)}
                                                     className="w-full py-2 px-4 bg-orange-500/20 text-orange-400 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-orange-500/30 transition-colors"

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Send, X, Bot, Info } from 'lucide-react';
 import { AIService } from '../services/AIService';
@@ -15,6 +15,10 @@ interface Message {
     timestamp: Date;
 }
 
+export interface AIAssistantHandle {
+    ask: (question: string) => void;
+}
+
 // Pre-defined quick suggestions
 const SUGGESTED_PROMPTS = [
     "Bu belgeyi özetle",
@@ -23,7 +27,7 @@ const SUGGESTED_PROMPTS = [
     "Belgenin türü nedir?"
 ];
 
-export const AIAssistant = ({ documentContext, documentTitle }: Props) => {
+export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentContext, documentTitle }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
@@ -32,15 +36,26 @@ export const AIAssistant = ({ documentContext, documentTitle }: Props) => {
     // UI Refs
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    useImperativeHandle(ref, () => ({
+        ask: (question: string) => {
+            setIsOpen(true);
+            // We need to trigger the send with this question
+            // Since handleSend relies on state or args, let's update handleSend to accept an optional arg
+            handleSend(question);
+        }
+    }));
+
     // Scroll to bottom on new message
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isOpen]);
 
-    const handleSend = async () => {
-        if (!input.trim() || loading) return;
+    const handleSend = async (textOverride?: string) => {
+        const textToUse = textOverride || input;
 
-        const userText = input.trim();
+        if (!textToUse.trim() || loading) return;
+
+        const userText = textToUse.trim();
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -50,7 +65,7 @@ export const AIAssistant = ({ documentContext, documentTitle }: Props) => {
         };
 
         setMessages(prev => [...prev, userMessage]);
-        setInput('');
+        if (!textOverride) setInput(''); // Only clear input if sent from input
         setLoading(true);
 
         try {
@@ -196,7 +211,7 @@ export const AIAssistant = ({ documentContext, documentTitle }: Props) => {
                                         disabled={loading}
                                     />
                                     <button
-                                        onClick={handleSend}
+                                        onClick={() => handleSend()}
                                         disabled={!input.trim() || loading}
                                         className="p-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                                     >
@@ -216,4 +231,6 @@ export const AIAssistant = ({ documentContext, documentTitle }: Props) => {
             </AnimatePresence>
         </>
     );
-};
+});
+
+AIAssistant.displayName = 'AIAssistant';
