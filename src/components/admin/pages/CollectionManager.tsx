@@ -53,7 +53,8 @@ export default function CollectionManager() {
         const localDocs = DocumentService.getAllDocuments();
 
         // Get Supabase documents
-        const supabaseDocs = await DocumentService.getAllDocumentsFromSupabase();
+        const supabaseResult = await DocumentService.getAllDocumentsFromSupabase();
+        const supabaseDocs = supabaseResult.success ? supabaseResult.documents : [];
 
         // Merge and remove duplicates (prefer Supabase versions if ID matches)
         const allDocsMap = new Map<string, ArchivalDocument>();
@@ -62,7 +63,16 @@ export default function CollectionManager() {
         localDocs.forEach(doc => allDocsMap.set(doc.id, doc));
 
         // Override with Supabase docs (they have priority)
-        supabaseDocs.forEach(doc => allDocsMap.set(doc.id, doc));
+        // Map Supabase format to ArchivalDocument format
+        supabaseDocs.forEach((doc: any) => {
+            allDocsMap.set(doc.id, {
+                id: doc.id,
+                title: doc.title,
+                imageUrl: doc.image_url,
+                difficulty: doc.difficulty || 'Orta',
+                category: doc.category || 'Genel',
+            });
+        });
 
         // Convert back to array and sort by title
         const mergedDocs = Array.from(allDocsMap.values()).sort((a, b) =>
