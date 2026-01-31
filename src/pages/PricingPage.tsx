@@ -39,24 +39,31 @@ export const PricingPage = () => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Payment API error:', errorData);
-                throw new Error(errorData.error?.errorMessage || errorData.error || 'Ödeme başlatılamadı.');
+                // Try to parse error as JSON
+                try {
+                    const errorData = await response.json();
+                    console.error('Payment API error:', errorData);
+                    throw new Error(errorData.error || 'Ödeme başlatılamadı.');
+                } catch {
+                    throw new Error('Ödeme başlatılamadı.');
+                }
             }
 
-            const data = await response.json();
-            const { paymentPageUrl } = data;
+            // Get the HTML response which contains auto-submit form
+            const htmlContent = await response.text();
 
-            if (paymentPageUrl) {
-                window.location.href = paymentPageUrl;
+            // Create a new window/tab with the payment form
+            const paymentWindow = window.open('', '_self');
+            if (paymentWindow) {
+                paymentWindow.document.write(htmlContent);
+                paymentWindow.document.close();
             } else {
-                throw new Error('Ödeme sayfası URL\'i alınamadı.');
+                throw new Error('Ödeme sayfası açılamadı. Lütfen pop-up engelleyicinizi kontrol edin.');
             }
 
         } catch (err: any) {
             console.error('Payment error:', err);
             showToast('error', err.message || 'Bir hata oluştu.');
-        } finally {
             setLoading(false);
         }
     };
@@ -131,7 +138,7 @@ export const PricingPage = () => {
                             </button>
                         </div>
                         <div className="mt-4 text-xs text-gray-500 flex items-center gap-1">
-                            <Shield size={12} /> Güvenli Ödeme (Iyzico Altyapısı)
+                            <Shield size={12} /> Güvenli Ödeme (Shopier Altyapısı)
                         </div>
                     </div>
                 </div>

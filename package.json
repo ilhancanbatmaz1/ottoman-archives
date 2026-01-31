@@ -17,7 +17,6 @@
     "@vercel/node": "^5.5.27",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.27.5",
-    "iyzipay": "^2.0.64",
     "lucide-react": "^0.562.0",
     "micro": "^10.0.1",
     "react": "^19.2.0",

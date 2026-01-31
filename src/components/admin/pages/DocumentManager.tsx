@@ -83,7 +83,11 @@ export const DocumentManager = () => {
                         </div>
                         <div className="flex gap-3">
                             <button onClick={() => setDeleteDocConfirmId(null)} className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">Vazgeç</button>
-                            <button onClick={() => { deleteDocument(deleteDocConfirmId); showToast('success', 'Belge silindi'); setDeleteDocConfirmId(null); }} className="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
+                            <button onClick={async () => {
+                                await deleteDocument(deleteDocConfirmId);
+                                showToast('success', 'Belge silindi');
+                                setDeleteDocConfirmId(null);
+                            }} className="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
                                 <Trash2 size={18} /> Evet, Sil
                             </button>
                         </div>

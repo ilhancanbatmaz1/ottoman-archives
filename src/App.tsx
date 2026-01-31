@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scroll, ChevronDown, BookOpen, TrendingUp, Trophy, User, Power, Loader2, Star } from 'lucide-react';
+import { Scroll, ChevronDown, BookOpen, TrendingUp, Trophy, User, Power, Loader2 } from 'lucide-react';
 import { DocumentViewer } from './components/DocumentViewer';
 import { InstallPrompt } from './components/InstallPrompt';
 import { DocumentProvider } from './context/DocumentContext';
@@ -39,8 +39,7 @@ const SignupPage = lazy(() => import('./pages/auth/SignupPage').then(module => (
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage').then(module => ({ default: module.ForgotPasswordPage })));
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage').then(module => ({ default: module.ResetPasswordPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
-const PricingPage = lazy(() => import('./pages/PricingPage').then(module => ({ default: module.PricingPage })));
-const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage').then(module => ({ default: module.PaymentSuccessPage })));
+
 
 // Loading Component
 const PageLoader = () => (
@@ -105,12 +104,7 @@ function PublicApp() {
               <Trophy size={16} />
               <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Sıralama</span>
             </Link>
-            <Link to="/premium" className="flex items-center gap-1 text-amber-600 hover:text-amber-700 transition-colors bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
-              <Star size={14} className="fill-amber-600" />
-              <span className="text-xs font-bold uppercase tracking-wider">Premium</span>
-            </Link>
 
-            <div className="w-px h-6 bg-gray-200 mx-2" />
 
             {user && (
               <div className="flex items-center gap-3">
@@ -312,12 +306,7 @@ function MainRoutes() {
             <LeaderboardPage />
           </ProtectedRoute>
         } />
-        <Route path="/premium" element={<PricingPage />} />
-        <Route path="/success" element={
-          <ProtectedRoute>
-            <PaymentSuccessPage />
-          </ProtectedRoute>
-        } />
+
 
         {/* 404 Route */}
         <Route path="*" element={<NotFoundPage />} />
