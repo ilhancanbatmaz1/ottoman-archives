@@ -205,11 +205,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(true);
         try {
             if (authMode === 'supabase') {
-                await AuthService.signOutFromSupabase();
+                // Try Supabase signout, but don't let failure block logout
+                try {
+                    await AuthService.signOutFromSupabase();
+                } catch (error) {
+                    console.error('Supabase signout failed, clearing local state anyway:', error);
+                    // Continue to clear local state even if Supabase fails
+                }
             } else {
                 AuthService.logoutUser();
             }
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Always clear state even on error
         } finally {
+            // ALWAYS clear user state, regardless of Supabase success
             setUser(null);
             setIsLoading(false);
         }

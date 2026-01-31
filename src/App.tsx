@@ -58,7 +58,7 @@ function PublicApp() {
   const [filterYear, setFilterYear] = useState('Tümü');
 
   const [selectedDoc, setSelectedDoc] = useState<ArchivalDocument | null>(null);
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -115,11 +115,27 @@ function PublicApp() {
                   <span className="text-sm font-bold hidden md:inline">{user.username}</span>
                 </div>
                 <button
-                  onClick={logout}
-                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isLoading) return; // Prevent double-click
+                    try {
+                      await logout();
+                    } catch (err) {
+                      console.error('Logout button error:', err);
+                      // Force logout anyway
+                      window.location.reload();
+                    }
+                  }}
+                  disabled={isLoading}
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Çıkış Yap"
                 >
-                  <Power size={18} />
+                  {isLoading ? (
+                    <div className="w-[18px] h-[18px] border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Power size={18} />
+                  )}
                 </button>
               </div>
             )}
