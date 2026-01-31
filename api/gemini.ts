@@ -40,15 +40,13 @@ export default async function handler(req, res) {
 
         // Initialize Gemini API
         const genAI = new GoogleGenerativeAI(API_KEY);
-        // Use a model that supports JSON mode well if available, otherwise flash is fine with good prompting
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
-            generationConfig: {
-                responseMimeType: req.body.mode === 'quiz' ? 'application/json' : 'text/plain'
-            }
-        });
 
         const isQuizMode = req.body.mode === 'quiz';
+
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            generationConfig: isQuizMode ? { responseMimeType: 'application/json' } : undefined
+        });
 
         let systemInstruction = `
 Sen bir Osmanlıca belgesi uzmanı ve yardımcı asistanısın (Adın: Mr. Osmanlıca).
