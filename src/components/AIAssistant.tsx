@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Send, X, Info } from 'lucide-react';
+import { Sparkles, Send, X, Info, Check, AlertCircle } from 'lucide-react';
 import { AIService } from '../services/AIService';
 
 interface Props {
@@ -8,10 +8,19 @@ interface Props {
     documentTitle: string;
 }
 
+interface QuizQuestion {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+    explanation: string;
+}
+
 interface Message {
     id: string;
     role: 'user' | 'model';
     text: string;
+    isQuiz?: boolean;
+    quizData?: QuizQuestion[];
     timestamp: Date;
 }
 
@@ -27,6 +36,68 @@ const SUGGESTED_PROMPTS = [
     "Belgenin türü nedir?"
 ];
 
+// Quiz Card Component
+const QuizCard = ({ question, index, onAnswer }: { question: QuizQuestion, index: number, onAnswer: (isCorrect: boolean) => void }) => {
+    const [selectedOption, setSelectedOption] = useState<number | null>(null);
+    const [isAnswered, setIsAnswered] = useState(false);
+
+    const handleSelect = (optionIndex: number) => {
+        if (isAnswered) return;
+        setSelectedOption(optionIndex);
+        setIsAnswered(true);
+        onAnswer(optionIndex === question.correctAnswer);
+    };
+
+    return (
+        <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 mt-2 mb-4 w-full">
+            <div className="bg-amber-50 p-3 border-b border-amber-100 flex justify-between items-center">
+                <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">Soru {index + 1}</span>
+                {isAnswered && (
+                    selectedOption === question.correctAnswer
+                        ? <span className="text-xs font-bold text-green-600 flex items-center gap-1"><Check size={12} /> Doğru</span>
+                        : <span className="text-xs font-bold text-red-600 flex items-center gap-1"><AlertCircle size={12} /> Yanlış</span>
+                )}
+            </div>
+            <div className="p-4">
+                <p className="text-sm font-medium text-gray-800 mb-3">{question.question}</p>
+                <div className="space-y-2">
+                    {question.options.map((option, optIndex) => {
+                        let btnClass = "w-full text-left p-3 text-xs rounded-lg border transition-all relative ";
+
+                        if (isAnswered) {
+                            if (optIndex === question.correctAnswer) {
+                                btnClass += "bg-green-100 border-green-300 text-green-800 font-bold";
+                            } else if (optIndex === selectedOption && selectedOption !== question.correctAnswer) {
+                                btnClass += "bg-red-50 border-red-200 text-red-800";
+                            } else {
+                                btnClass += "bg-gray-50 border-gray-100 text-gray-400 opacity-60";
+                            }
+                        } else {
+                            btnClass += "bg-white border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-700";
+                        }
+
+                        return (
+                            <button
+                                key={optIndex}
+                                onClick={() => handleSelect(optIndex)}
+                                disabled={isAnswered}
+                                className={btnClass}
+                            >
+                                <span className="font-bold mr-2">{String.fromCharCode(65 + optIndex)}.</span> {option}
+                            </button>
+                        );
+                    })}
+                </div>
+                {isAnswered && (
+                    <div className="mt-3 text-xs text-gray-500 bg-gray-50 p-2 rounded border border-gray-100 italic">
+                        <span className="font-bold">Açıklama:</span> {question.explanation}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
 export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentContext, documentTitle }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -39,8 +110,6 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
     useImperativeHandle(ref, () => ({
         ask: (question: string) => {
             setIsOpen(true);
-            // We need to trigger the send with this question
-            // Since handleSend relies on state or args, let's update handleSend to accept an optional arg
             handleSend(question);
         }
     }));
@@ -56,6 +125,7 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
         if (!textToUse.trim() || loading) return;
 
         const userText = textToUse.trim();
+        const isQuizRequest = userText.toLowerCase().includes("test et") || userText.toLowerCase().includes("sınav");
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -65,24 +135,60 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
         };
 
         setMessages(prev => [...prev, userMessage]);
-        if (!textOverride) setInput(''); // Only clear input if sent from input
+        if (!textOverride) setInput('');
         setLoading(true);
 
         try {
-            // Prepare history in the format expected by our service
-            const history = messages.map(m => ({
+            // Determine mode
+            const mode = isQuizRequest ? 'quiz' : 'chat';
+
+            const history = messages.filter(m => !m.isQuiz).map(m => ({
                 role: m.role,
                 text: m.text
             }));
 
-            const responseText = await AIService.chat(userText, documentContext, history);
+            const responseText = await AIService.chat(userText, documentContext, history, mode);
 
-            const aiMessage: Message = {
-                id: (Date.now() + 1).toString(),
-                role: 'model',
-                text: responseText,
-                timestamp: new Date()
-            };
+            let aiMessage: Message;
+
+            if (mode === 'quiz') {
+                try {
+                    // Start parsing from first [ and end at last ]
+                    const jsonStart = responseText.indexOf('[');
+                    const jsonEnd = responseText.lastIndexOf(']');
+
+                    if (jsonStart !== -1 && jsonEnd !== -1) {
+                        const jsonStr = responseText.substring(jsonStart, jsonEnd + 1);
+                        const quizData = JSON.parse(jsonStr) as QuizQuestion[];
+
+                        aiMessage = {
+                            id: (Date.now() + 1).toString(),
+                            role: 'model',
+                            text: 'İşte belgenizle ilgili hazırladığım sorular. Başarılar! 🎩',
+                            isQuiz: true,
+                            quizData: quizData,
+                            timestamp: new Date()
+                        };
+                    } else {
+                        throw new Error("Invalid JSON format");
+                    }
+                } catch (e) {
+                    console.error("Quiz parse error", e);
+                    aiMessage = {
+                        id: (Date.now() + 1).toString(),
+                        role: 'model',
+                        text: 'Sınav oluşturulurken bir hata oluştu, ancak metin olarak cevap verebilirim: \n' + responseText,
+                        timestamp: new Date()
+                    };
+                }
+            } else {
+                aiMessage = {
+                    id: (Date.now() + 1).toString(),
+                    role: 'model',
+                    text: responseText,
+                    timestamp: new Date()
+                };
+            }
 
             setMessages(prev => [...prev, aiMessage]);
         } catch (error) {
@@ -100,8 +206,7 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
     };
 
     const handleQuickPrompt = (prompt: string) => {
-        setInput(prompt);
-        // Optional: you could auto-send here if desired
+        handleSend(prompt);
     };
 
     return (
@@ -177,12 +282,19 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
                                     )}
 
                                     <div
-                                        className={`max-w-[75%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                                                ? 'bg-amber-600 text-white rounded-br-none shadow-md'
-                                                : 'bg-white text-gray-800 shadow-md border border-gray-100 rounded-bl-none'
+                                        className={`max-w-[85%] ${msg.isQuiz ? 'w-full' : ''} ${msg.role === 'user'
+                                                ? 'bg-amber-600 text-white p-3 rounded-2xl rounded-br-none shadow-md'
+                                                : 'bg-white text-gray-800 shadow-md border border-gray-100 rounded-2xl rounded-bl-none p-3'
                                             }`}
                                     >
                                         {msg.text}
+                                        {msg.isQuiz && msg.quizData && (
+                                            <div className="mt-2">
+                                                {msg.quizData.map((q, idx) => (
+                                                    <QuizCard key={idx} question={q} index={idx} onAnswer={() => { }} />
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))}

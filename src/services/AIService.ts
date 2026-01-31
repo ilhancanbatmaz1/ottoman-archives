@@ -5,7 +5,7 @@ export class AIService {
     /**
      * Send a message to the AI via our backend proxy
      */
-    static async chat(message: string, documentContext: string, history: { role: 'user' | 'model', text: string }[] = []): Promise<string> {
+    static async chat(message: string, documentContext: string, history: { role: 'user' | 'model', text: string }[] = [], mode: 'chat' | 'quiz' = 'chat'): Promise<string> {
         try {
             const response = await fetch('/api/gemini', {
                 method: 'POST',
@@ -15,7 +15,8 @@ export class AIService {
                 body: JSON.stringify({
                     message,
                     documentContext,
-                    history
+                    history,
+                    mode
                 }),
             });
 
