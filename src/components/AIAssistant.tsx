@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Send, X, Bot, Info } from 'lucide-react';
+import { Sparkles, Send, X, Info } from 'lucide-react';
 import { AIService } from '../services/AIService';
 
 interface Props {
@@ -129,8 +129,15 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
                     >
                         {/* Header */}
                         <div className="bg-amber-600 p-4 text-white flex justify-between items-center shadow-sm">
-                            <div className="flex items-center gap-2">
-                                <Bot size={20} />
+                            <div className="flex items-center gap-3">
+                                <div className="relative">
+                                    <img
+                                        src="/mr_osmanlica.png"
+                                        alt="Mr. Osmanlıca"
+                                        className="w-10 h-10 rounded-full border-2 border-white/20 shadow-sm object-cover bg-amber-100"
+                                    />
+                                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-amber-600 rounded-full"></div>
+                                </div>
                                 <div>
                                     <h3 className="font-bold">Mr. Osmanlıca 🎩</h3>
                                     <p className="text-xs text-amber-100 opacity-80 line-clamp-1">{documentTitle}</p>
@@ -142,10 +149,14 @@ export const AIAssistant = forwardRef<AIAssistantHandle, Props>(({ documentConte
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
                             {messages.length === 0 && (
                                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4 opacity-60">
-                                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center">
-                                        <Sparkles size={32} className="text-amber-500" />
+                                    <div className="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mb-2 shadow-inner border-4 border-white">
+                                        <img
+                                            src="/mr_osmanlica.png"
+                                            alt="Mr. Osmanlıca"
+                                            className="w-full h-full rounded-full object-cover"
+                                        />
                                     </div>
-                                    <h4 className="font-bold text-gray-700">Size nasıl yardımcı olabilirim?</h4>
+                                    <h4 className="font-bold text-gray-700 text-lg">Merhaba! Ben Mr. Osmanlıca</h4>
                                     <p className="text-sm text-gray-500">
                                         Belgeyi analiz ettim. Çeviri isteyebilir veya kelime anlamlarını sorabilirsiniz.
                                     </p>
