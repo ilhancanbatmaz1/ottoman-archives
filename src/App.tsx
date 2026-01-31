@@ -31,9 +31,12 @@ const ContentManager = lazy(() => import('./components/admin/pages/ContentManage
 const DocumentEdit = lazy(() => import('./components/admin/pages/DocumentEdit').then(module => ({ default: module.DocumentEdit })));
 const DocumentUpload = lazy(() => import('./components/admin/pages/DocumentUpload').then(module => ({ default: module.DocumentUpload })));
 const ReportManager = lazy(() => import('./components/admin/pages/ReportManager').then(module => ({ default: module.ReportManager })));
+const CollectionManager = lazy(() => import('./components/admin/pages/CollectionManager'));
 const ProgressPage = lazy(() => import('./pages/ProgressPage').then(module => ({ default: module.ProgressPage })));
 const DictionaryPage = lazy(() => import('./pages/DictionaryPage').then(module => ({ default: module.DictionaryPage })));
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage').then(module => ({ default: module.LeaderboardPage })));
+const CollectionsPage = lazy(() => import('./pages/CollectionsPage').then(module => ({ default: module.CollectionsPage })));
+const CollectionDetailPage = lazy(() => import('./pages/CollectionDetailPage').then(module => ({ default: module.CollectionDetailPage })));
 const LoginPage = lazy(() => import('./pages/auth/LoginPage').then(module => ({ default: module.LoginPage })));
 const SignupPage = lazy(() => import('./pages/auth/SignupPage').then(module => ({ default: module.SignupPage })));
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage').then(module => ({ default: module.ForgotPasswordPage })));
@@ -96,6 +99,10 @@ function PublicApp() {
           </div>
 
           <div className="flex items-center gap-4">
+            <Link to="/collections" className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors">
+              <BookOpen size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Koleksiyonlar</span>
+            </Link>
             <Link to="/progress" className="flex items-center gap-1 text-gray-500 hover:text-amber-600 transition-colors">
               <TrendingUp size={16} />
               <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">İlerleme</span>
@@ -251,6 +258,8 @@ function MainRoutes() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/collections" element={<CollectionsPage />} />
+        <Route path="/collections/:id" element={<CollectionDetailPage />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLogin />} />
@@ -302,6 +311,13 @@ function MainRoutes() {
           <AdminProtectedRoute>
             <AdminLayout>
               <ReportManager />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/collections" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <CollectionManager />
             </AdminLayout>
           </AdminProtectedRoute>
         } />
