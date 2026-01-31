@@ -48,9 +48,28 @@ export default function CollectionManager() {
         setLoading(false);
     };
 
-    const loadAllDocuments = () => {
-        const docs = DocumentService.getAllDocuments();
-        setAllDocuments(docs);
+    const loadAllDocuments = async () => {
+        // Get hardcoded documents
+        const localDocs = DocumentService.getAllDocuments();
+
+        // Get Supabase documents
+        const supabaseDocs = await DocumentService.getAllDocumentsFromSupabase();
+
+        // Merge and remove duplicates (prefer Supabase versions if ID matches)
+        const allDocsMap = new Map<string, ArchivalDocument>();
+
+        // Add local docs first
+        localDocs.forEach(doc => allDocsMap.set(doc.id, doc));
+
+        // Override with Supabase docs (they have priority)
+        supabaseDocs.forEach(doc => allDocsMap.set(doc.id, doc));
+
+        // Convert back to array and sort by title
+        const mergedDocs = Array.from(allDocsMap.values()).sort((a, b) =>
+            a.title.localeCompare(b.title, 'tr')
+        );
+
+        setAllDocuments(mergedDocs);
     };
 
     const resetForm = () => {
