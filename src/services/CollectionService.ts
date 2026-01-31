@@ -66,16 +66,50 @@ export class CollectionService {
 
             if (docsError) throw docsError;
 
-            // Fetch full document details from localStorage or Supabase
-            // Note: Assuming documents are stored in localStorage for now
-            // TODO: If documents are in Supabase, fetch from there
-            const documentsJson = localStorage.getItem('documents');
-            const allDocuments = documentsJson ? JSON.parse(documentsJson) : [];
+            // Fetch full document details from Supabase
+            const documentIds = (collectionDocs || []).map(cd => cd.document_id);
 
+            if (documentIds.length === 0) {
+                return {
+                    ...collection,
+                    documents: [],
+                };
+            }
+
+            // Query Supabase for the actual documents
+            const { data: supabaseDocuments, error: supabaseDocsError } = await supabase
+                .from('documents')
+                .select('*')
+                .in('id', documentIds);
+
+            if (supabaseDocsError) {
+                console.error('Error fetching documents from Supabase:', supabaseDocsError);
+            }
+
+            // Merge with order information and map to expected format
             const documents = (collectionDocs || [])
                 .map((cd) => {
-                    const doc = allDocuments.find((d: any) => d.id === cd.document_id);
-                    return doc ? { ...doc, order_index: cd.order_index } : null;
+                    const supabaseDoc = supabaseDocuments?.find((d: any) => d.id === cd.document_id);
+
+                    if (supabaseDoc) {
+                        return {
+                            id: supabaseDoc.id,
+                            title: supabaseDoc.title,
+                            imageUrl: supabaseDoc.image_url,
+                            difficulty: supabaseDoc.difficulty || 'Orta',
+                            category: supabaseDoc.category || 'Genel',
+                            year: supabaseDoc.year,
+                            description: supabaseDoc.description,
+                            order_index: cd.order_index,
+                        };
+                    }
+
+                    // Fallback to localStorage if not in Supabase
+                    const documentsJson = localStorage.getItem('documents');
+                    const localDocuments = documentsJson ? JSON.parse(documentsJson) : [];
+                    const localDoc = localDocuments.find((d: any) => d.id === cd.document_id);
+
+                    return localDoc ? { ...localDoc, order_index: cd.order_index } : null;
                 })
                 .filter((d) => d !== null);
 
